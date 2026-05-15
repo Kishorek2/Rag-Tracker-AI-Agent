@@ -1,0 +1,5 @@
+{
+  "routes": [
+    { "src": "/", "dest": "/rag-tracker-ai-agent.html" }
+  ]
+}
