@@ -1,0 +1,1885 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RAG & AI Agents — 70-Day Learning Tracker</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:        #07090f;
+  --surface:   #0d1117;
+  --surface2:  #161b22;
+  --border:    #21262d;
+  --border2:   #30363d;
+  --text:      #c9d1d9;
+  --muted:     #58a6b0;
+  --heading:   #e6edf3;
+  --c-found:   #22d3ee;
+  --c-rag:     #38bdf8;
+  --c-agent:   #fb923c;
+  --c-adv:     #86efac;
+  --c-prod:    #fbbf24;
+  --c-found-d: #083344;
+  --c-rag-d:   #0c2340;
+  --c-agent-d: #3d1a0a;
+  --c-adv-d:   #0f2e18;
+  --c-prod-d:  #2e1f03;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:'DM Mono',monospace;
+  font-size:13px;
+  line-height:1.5;
+  min-height:100vh;
+}
+body::before{
+  content:'';
+  position:fixed;inset:0;
+  background-image:
+    linear-gradient(rgba(34,211,238,.025) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(34,211,238,.025) 1px,transparent 1px);
+  background-size:48px 48px;
+  pointer-events:none;z-index:0;
+}
+.site-header{
+  position:sticky;top:0;z-index:100;
+  background:rgba(7,9,15,.92);
+  backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--border2);
+  padding:0 24px;
+}
+.header-inner{
+  max-width:1600px;margin:0 auto;
+  display:flex;align-items:center;gap:20px;
+  height:56px;
+}
+.logo{
+  font-family:'Syne',sans-serif;
+  font-weight:800;font-size:16px;
+  color:var(--heading);
+  white-space:nowrap;
+  letter-spacing:-0.02em;
+}
+.logo span{color:var(--c-found)}
+.header-stats{
+  display:flex;gap:16px;align-items:center;
+  margin-left:auto;
+}
+.stat-pill{
+  display:flex;align-items:center;gap:6px;
+  background:var(--surface2);
+  border:1px solid var(--border2);
+  border-radius:20px;
+  padding:4px 12px;
+  font-size:11px;color:var(--muted);
+}
+.stat-pill strong{color:var(--heading)}
+.progress-wrap{
+  width:120px;height:6px;
+  background:var(--border2);border-radius:3px;
+  overflow:hidden;
+}
+.progress-fill{
+  height:100%;width:0%;
+  background:linear-gradient(90deg,var(--c-found),var(--c-adv));
+  border-radius:3px;transition:width .4s ease;
+}
+.nav-tabs{
+  background:var(--surface);
+  border-bottom:1px solid var(--border);
+  padding:0 24px;
+  position:sticky;top:56px;z-index:90;
+}
+.nav-inner{
+  max-width:1600px;margin:0 auto;
+  display:flex;gap:0;
+}
+.nav-tab{
+  padding:12px 20px;
+  font-family:'DM Mono',monospace;
+  font-size:11px;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  color:var(--muted);
+  cursor:pointer;
+  border:none;background:none;
+  border-bottom:2px solid transparent;
+  transition:all .2s;
+  white-space:nowrap;
+}
+.nav-tab:hover{color:var(--heading)}
+.nav-tab.active{color:var(--c-found);border-bottom-color:var(--c-found)}
+main{max-width:1600px;margin:0 auto;padding:24px;position:relative;z-index:1}
+.filter-bar{
+  display:flex;flex-wrap:wrap;gap:8px;
+  margin-bottom:20px;
+  align-items:center;
+}
+.filter-label{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-right:4px}
+.filter-btn{
+  padding:5px 14px;border-radius:3px;
+  font-family:'DM Mono',monospace;font-size:10px;
+  letter-spacing:.08em;text-transform:uppercase;
+  cursor:pointer;border:1px solid var(--border2);
+  background:var(--surface2);color:var(--muted);
+  transition:all .15s;
+}
+.filter-btn:hover,.filter-btn.active{
+  border-color:var(--c-found);color:var(--c-found);
+  background:rgba(34,211,238,.08);
+}
+.filter-btn.f-rag.active{border-color:var(--c-rag);color:var(--c-rag);background:rgba(56,189,248,.08)}
+.filter-btn.f-agent.active{border-color:var(--c-agent);color:var(--c-agent);background:rgba(251,146,60,.08)}
+.filter-btn.f-adv.active{border-color:var(--c-adv);color:var(--c-adv);background:rgba(134,239,172,.08)}
+.filter-btn.f-prod.active{border-color:var(--c-prod);color:var(--c-prod);background:rgba(251,191,36,.08)}
+.search-box{
+  margin-left:auto;
+  padding:5px 12px;border-radius:3px;
+  border:1px solid var(--border2);
+  background:var(--surface2);color:var(--heading);
+  font-family:'DM Mono',monospace;font-size:11px;
+  width:200px;outline:none;
+}
+.search-box:focus{border-color:var(--c-found)}
+.search-box::placeholder{color:var(--muted)}
+.table-wrap{
+  overflow-x:auto;
+  border:1px solid var(--border);
+  border-radius:6px;
+}
+table{
+  width:100%;border-collapse:collapse;
+  min-width:1100px;
+}
+thead th{
+  background:var(--surface2);
+  color:var(--muted);
+  font-size:9px;letter-spacing:.14em;text-transform:uppercase;
+  padding:10px 12px;
+  text-align:left;
+  border-bottom:1px solid var(--border2);
+  white-space:nowrap;
+}
+.day-row{
+  border-bottom:1px solid var(--border);
+  transition:background .15s;
+}
+.day-row:hover{background:rgba(255,255,255,.03)}
+.day-row td{padding:10px 12px;vertical-align:top}
+.day-row.foundation{border-left:3px solid var(--c-found)}
+.day-row.rag{border-left:3px solid var(--c-rag)}
+.day-row.agent{border-left:3px solid var(--c-agent)}
+.day-row.advanced{border-left:3px solid var(--c-adv)}
+.day-row.production{border-left:3px solid var(--c-prod)}
+.day-row.weekend{opacity:.55;font-style:italic}
+.day-row.project-row{background:rgba(251,191,36,.04)}
+.day-row.status-done{background:rgba(134,239,172,.06)}
+.day-row.status-skip{opacity:.4}
+.day-num{
+  font-family:'Syne',sans-serif;font-weight:700;
+  font-size:16px;color:var(--border2);
+  width:40px;text-align:center;
+}
+.date-cell{width:72px}
+.date-d{display:block;color:var(--heading);font-size:12px}
+.date-dn{font-size:10px;color:var(--muted)}
+.phase-badge{
+  display:inline-block;font-size:8px;letter-spacing:.1em;
+  text-transform:uppercase;padding:2px 6px;border-radius:2px;
+  font-weight:500;white-space:nowrap;
+}
+.phase-badge.foundation{background:var(--c-found-d);color:var(--c-found)}
+.phase-badge.rag{background:var(--c-rag-d);color:var(--c-rag)}
+.phase-badge.agent{background:var(--c-agent-d);color:var(--c-agent)}
+.phase-badge.advanced{background:var(--c-adv-d);color:var(--c-adv)}
+.phase-badge.production{background:var(--c-prod-d);color:var(--c-prod)}
+.track-tag{
+  display:inline-block;font-size:9px;letter-spacing:.08em;
+  text-transform:uppercase;padding:3px 8px;border-radius:10px;
+  font-weight:500;white-space:nowrap;border:1px solid;
+}
+.track-tag.foundation{border-color:var(--c-found);color:var(--c-found)}
+.track-tag.rag{border-color:var(--c-rag);color:var(--c-rag)}
+.track-tag.agent{border-color:var(--c-agent);color:var(--c-agent)}
+.track-tag.advanced{border-color:var(--c-adv);color:var(--c-adv)}
+.track-tag.production{border-color:var(--c-prod);color:var(--c-prod)}
+.topic-cell{min-width:220px;max-width:280px}
+.topic-cell strong{color:var(--heading);font-size:12px}
+.concept{color:var(--muted);font-size:11px;margin-top:3px;display:block;font-style:italic}
+.reading-cell{min-width:180px;max-width:240px}
+.res-link{
+  color:var(--c-rag);text-decoration:none;font-size:11px;
+  word-break:break-all;
+}
+.res-link:hover{text-decoration:underline}
+.task-cell{min-width:200px;max-width:280px;font-size:11px;color:var(--text)}
+.status-select{
+  background:var(--surface2);color:var(--heading);
+  border:1px solid var(--border2);border-radius:3px;
+  padding:4px 6px;font-family:'DM Mono',monospace;font-size:11px;
+  cursor:pointer;width:130px;outline:none;
+}
+.status-select:focus{border-color:var(--c-found)}
+.notes-input{
+  background:transparent;border:none;
+  border-bottom:1px solid var(--border2);
+  color:var(--text);font-family:'DM Mono',monospace;font-size:11px;
+  width:100%;padding:2px 0;outline:none;min-width:120px;
+}
+.notes-input:focus{border-bottom-color:var(--c-found)}
+.notes-input::placeholder{color:var(--border2)}
+.day-row.hidden{display:none}
+.tab-panel{display:none}
+.tab-panel.active{display:block}
+.cert-milestone{margin-bottom:36px}
+.cert-milestone h3{
+  font-family:'Syne',sans-serif;font-weight:700;
+  font-size:14px;color:var(--heading);
+  margin-bottom:16px;padding-bottom:8px;
+  border-bottom:1px solid var(--border2);
+}
+.cert-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}
+.cert-card{
+  background:var(--surface2);border:1px solid var(--border2);
+  border-radius:6px;padding:16px;
+  transition:border-color .2s;
+}
+.cert-card:hover{border-color:var(--c-found)}
+.cert-type{
+  font-size:9px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--c-prod);margin-bottom:8px;
+}
+.cert-name{color:var(--heading);font-size:12px;font-weight:500;margin-bottom:6px;line-height:1.4}
+.cert-cost{color:var(--muted);font-size:11px;margin-bottom:10px}
+.cert-link{
+  display:inline-block;color:var(--c-found);font-size:11px;
+  text-decoration:none;border:1px solid var(--c-found);
+  border-radius:3px;padding:3px 10px;
+  transition:all .15s;
+}
+.cert-link:hover{background:rgba(34,211,238,.1)}
+.resources-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px}
+.res-section{background:var(--surface2);border:1px solid var(--border2);border-radius:6px;padding:16px}
+.res-section h3{
+  font-family:'Syne',sans-serif;font-size:13px;font-weight:700;
+  color:var(--heading);margin-bottom:12px;
+}
+.res-list{list-style:none}
+.res-list li{
+  display:flex;align-items:baseline;justify-content:space-between;
+  gap:8px;padding:6px 0;
+  border-bottom:1px solid var(--border);font-size:11px;
+}
+.res-list li:last-child{border-bottom:none}
+.res-list a{color:var(--c-rag);text-decoration:none}
+.res-list a:hover{text-decoration:underline}
+.res-cost{color:var(--muted);font-size:10px;white-space:nowrap}
+.dash-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;margin-bottom:32px}
+.dash-card{
+  background:var(--surface2);border:1px solid var(--border2);
+  border-radius:6px;padding:16px 20px;
+  border-top:3px solid var(--c-found);
+}
+.dash-card.rag-card{border-top-color:var(--c-rag)}
+.dash-card.agent-card{border-top-color:var(--c-agent)}
+.dash-card.adv-card{border-top-color:var(--c-adv)}
+.dash-card.prod-card{border-top-color:var(--c-prod)}
+.dash-label{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.dash-val{font-family:'Syne',sans-serif;font-size:28px;font-weight:800;color:var(--heading)}
+.dash-sub{font-size:11px;color:var(--muted);margin-top:4px}
+.phase-progress{margin-bottom:24px}
+.phase-progress h3{font-family:'Syne',sans-serif;font-size:13px;color:var(--heading);margin-bottom:12px}
+.pphase-row{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+.pphase-name{width:300px;font-size:11px;color:var(--text)}
+.pphase-bar{flex:1;height:8px;background:var(--border2);border-radius:4px;overflow:hidden}
+.pphase-fill{height:100%;border-radius:4px;transition:width .4s ease}
+.pphase-fill.f{background:var(--c-found)}
+.pphase-fill.r{background:var(--c-rag)}
+.pphase-fill.a{background:var(--c-agent)}
+.pphase-fill.v{background:var(--c-adv)}
+.pphase-fill.p{background:var(--c-prod)}
+.pphase-pct{width:40px;font-size:11px;color:var(--muted);text-align:right}
+.today-banner{
+  background:rgba(34,211,238,.08);border:1px solid rgba(34,211,238,.25);
+  border-radius:6px;padding:12px 16px;
+  display:flex;align-items:center;gap:12px;margin-bottom:20px;
+  font-size:12px;color:var(--heading);
+}
+.today-dot{width:8px;height:8px;border-radius:50%;background:var(--c-found);flex-shrink:0;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.section-head{
+  font-family:'Syne',sans-serif;font-weight:700;
+  font-size:22px;color:var(--heading);
+  margin-bottom:6px;letter-spacing:-0.02em;
+}
+.section-sub{color:var(--muted);font-size:12px;margin-bottom:24px}
+.empty-state{text-align:center;padding:60px 20px;color:var(--muted);font-size:13px}
+@media(max-width:768px){
+  .header-inner{flex-wrap:wrap;height:auto;padding:10px 0}
+  .header-stats{flex-wrap:wrap}
+  .nav-tab{padding:10px 12px;font-size:10px}
+  main{padding:16px}
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-inner">
+    <div class="logo">RAG & <span>AI Agents</span> — 70-Day Tracker</div>
+    <div class="header-stats">
+      <div class="stat-pill">Start: <strong>16 May 2026</strong></div>
+      <div class="stat-pill">End: <strong>24 Jul 2026</strong></div>
+      <div class="stat-pill">Done: <strong id="doneCount">0</strong>/70</div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <div class="progress-wrap"><div class="progress-fill" id="progressFill"></div></div>
+        <span id="progressPct" style="font-size:10px;color:var(--muted)">0%</span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<nav class="nav-tabs">
+  <div class="nav-inner">
+    <button class="nav-tab active" onclick="switchTab('schedule',this)">📅 Daily Schedule</button>
+    <button class="nav-tab" onclick="switchTab('dashboard',this)">📊 Dashboard</button>
+    <button class="nav-tab" onclick="switchTab('certs',this)">🎓 Certifications</button>
+    <button class="nav-tab" onclick="switchTab('resources',this)">📚 Resources</button>
+  </div>
+</nav>
+
+<main>
+
+<div class="tab-panel active" id="tab-schedule">
+  <div id="today-banner" class="today-banner" style="display:none">
+    <div class="today-dot"></div>
+    <span id="today-text">Loading today's lesson…</span>
+  </div>
+  <div class="filter-bar">
+    <span class="filter-label">Filter:</span>
+    <button class="filter-btn active" onclick="filterTrack('all',this)">All</button>
+    <button class="filter-btn f-found" onclick="filterTrack('Foundation',this)">Foundation</button>
+    <button class="filter-btn f-rag" onclick="filterTrack('RAG',this)">RAG</button>
+    <button class="filter-btn f-agent" onclick="filterTrack('Agent',this)">Agents</button>
+    <button class="filter-btn f-adv" onclick="filterTrack('Advanced',this)">Multi-Agent</button>
+    <button class="filter-btn f-prod" onclick="filterTrack('Production',this)">Production</button>
+    <button class="filter-btn" onclick="filterTrack('done',this)">✅ Done Only</button>
+    <input type="text" class="search-box" placeholder="🔍 Search topics…" oninput="searchRows(this.value)">
+  </div>
+  <div class="table-wrap">
+    <table id="mainTable">
+      <thead>
+        <tr>
+          <th>#</th><th>Date</th><th>Phase</th><th>Track</th>
+          <th>Topic & Concept</th><th>Reading Material</th>
+          <th>Task / Exercise (2 hrs)</th><th>Status</th><th>Notes</th>
+        </tr>
+      </thead>
+      <tbody id="tableBody">
+
+    <tr class="day-row foundation weekend " data-day="1" data-track="Foundation">
+      <td class="day-num">1</td>
+      <td class="date-cell"><span class="date-d">16 May</span><span class="date-dn">Sat</span></td>
+      <td class="phase-cell"><span class="phase-badge foundation">Phase 0</span></td>
+      <td class="track-cell"><span class="track-tag foundation">Foundation</span></td>
+      <td class="topic-cell"><strong>Python Basics</strong><br><span class="concept">Python variables, functions, lists, dicts, loops</span></td>
+      <td class="reading-cell"><a href="https://python.org/doc/tutorial" target="_blank" rel="noopener" class="res-link">python.org/doc/tutorial</a></td>
+      <td class="task-cell">Write a script that reads a JSON file and prints values</td>
+      <td class="status-cell">
+        <select class="status-select" onchange="updateStatus(this, 1)">
+          <option value="todo">⬜ To Do</option>
+          <option value="progress">🔵 In Progress</option>
+          <option value="done">✅ Done</option>
+          <option value="skip">⏭ Skipped</option>
+        </select>
+      </td>
+      <td class="notes-cell"><input type="text" class="notes-input" placeholder="Add note..." onchange="saveNote(this, 1)"></td>
+    </tr>
+    <tr class="day-row foundation weekend " data-day="2" data-track="Foundation">
+      <td class="day-num">2</td>
+      <td class="date-cell"><span class="date-d">17 May</span><span class="date-dn">Sun</span></td>
+      <td class="phase-cell"><span class="phase-badge foundation">Phase 0</span></td>
+      <td class="track-cell"><span class="track-tag foundation">Foundation</span></td>
+      <td class="topic-cell"><strong>Python OOP</strong><br><span class="concept">Classes, inheritance, __init__, methods</span></td>
+      <td class="reading-cell"><a href="https://realpython.com/python3-object-oriented-programming" target="_blank" rel="noopener" class="res-link">realpython.com/python3-object-oriented-programming</a></td>
+      <td class="task-cell">Build a Document class with title, content, metadata</td>
+      <td class="status-cell">
+        <select class="status-select" onchange="updateStatus(this, 2)">
+          <option value="todo">⬜ To Do</option>
+          <option value="progress">🔵 In Progress</option>
+          <option value="done">✅ Done</option>
+          <option value="skip">⏭ Skipped</option>
+        </select>
+      </td>
+      <td class="notes-cell"><input type="text" class="notes-input" placeholder="Add note..." onchange="saveNote(this, 2)"></td>
+    </tr>
+    <tr class="day-row foundation  " data-day="3" data-track="Foundation">
+      <td class="day-num">3</td>
+      <td class="date-cell"><span class="date-d">18 May</span><span class="date-dn">Mon</span></td>
+      <td class="phase-cell"><span class="phase-badge foundation">Phase 0</span></td>
+      <td class="track-cell"><span class="track-tag foundation">Foundation</span></td>
+      <td class="topic-cell"><strong>Python File I/O + APIs</strong><br><span class="concept">File reading, requests lib, JSON parsing</span></td>
+      <td class="reading-cell"><a href="https://requests.readthedocs.io" target="_blank" rel="noopener" class="res-link">requests.readthedocs.io</a></td>
+      <td class="task-cell">Call a public REST API; parse and display the response</td>
+      <td class="status-cell">
+        <select class="status-select" onchange="updateStatus(this, 3)">
+          <option value="todo">⬜ To Do</option>
+          <option value="progress">🔵 In Progress</option>
+          <option value="done">✅ Done</option>
+          <option value="skip">⏭ Skipped</option>
+        </select>
+      </td>
+      <td class="notes-cell"><input type="text" class="notes-input" placeholder="Add note..." onchange="saveNote(this, 3)"></td>
+    </tr>
+    <tr class="day-row foundation  " data-day="4" data-track="Foundation">
+      <td class="day-num">4</td>
+      <td class="date-cell"><span class="date-d">19 May</span><span class="date-dn">Tue</span></td>
+      <td class="phase-cell"><span class="phase-badge foundation">Phase 0</span></td>
+      <td class="track-cell"><span class="track-tag foundation">Foundation</span></td>
+      <td class="topic-cell"><strong>pip, venv, dotenv</strong><br><span class="concept">Virtual envs, .env secrets, requirements.txt</span></td>
+      <td class="reading-cell"><a href="https://packaging.python.org/tutorials/installing-packages" target="_blank" rel="noopener" class="res-link">packaging.python.org/tutorials/installing-packages</a></td>
+      <td class="task-cell">Set up a project venv, install anthropic, store key in .env</td>
+      <td class="status-cell">
+        <select class="status-select" onchange="updateStatus(this, 4)">
+          <option value="todo">⬜ To Do</option>
+          <option value="progress">🔵 In Progress</option>
+          <option value="done">✅ Done</option>
+          <option value="skip">⏭ Skipped</option>
+        </select>
+      </td>
+      <td class="notes-cell"><input type="text" class="notes-input" placeholder="Add note..." onchange="saveNote(this, 4)"></td>
+    </tr>
+    <tr class="day-row foundation  " data-day="5" data-track="Foundation">
+      <td class="day-num">5</td>
+      <td class="date-cell"><span class="date-d">20 May</span><span class="date-dn">Wed</span></td>
+      <td class="phase-cell"><span class="phase-badge foundation">Phase 0</span></td>
+      <td class="track-cell"><span class="track-tag foundation">Foundation</span></td>
+      <td class="topic-cell"><strong>Call Your First LLM</strong><br><span class="concept">Anthropic SDK: messages.create, read response</span></td>
+      <td class="reading-cell"><a href="https://docs.anthropic.com/quickstart" target="_blank" rel="noopener" class="res-link">docs.anthropic.com/quickstart</a></td>
+      <td class="task-cell">Build a simple Q&A CLI chatbot using claude-opus-4-5</td>
+      <td class="status-cell">
+        <select class="status-select" onchange="updateStatus(this, 5)">
+          <option value="todo">⬜ To Do</option>
+          <option value="progress">🔵 In Progress</option>
+          <option value="done">✅ Done</option>
+          <option value="skip">⏭ Skipped</option>
+        </select>
+      </td>
+      <td class="notes-cell"><input type="text" class="notes-input" placeholder="Add note..." onchange="saveNote(this, 5)"></td>
+    </tr>
+    <tr class="day-row foundation  " data-day="6" data-track="Foundation">
+      <td class="day-num">6</td>
+      <td class="date-cell"><span class="date-d">21 May</span><span class="date-dn">Thu</span></td>
+      <td class="phase-cell"><span class="phase-badge foundation">Phase 0</span></td>
+      <td class="track-cell"><span class="track-tag foundation">Foundation</span></td>
+      <td class="topic-cell"><strong>Prompt Engineering</strong><br><span class="concept">System prompts, few-shot, temperature, top-p</span></td>
+      <td class="reading-cell"><a href="https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/overview" target="_blank" rel="noopener" class="res-link">docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/overview</a></td>
+      <td class="task-cell">Test same question with 3 different system prompts</td>
+      <td class="status-cell">
+        <select class="status-select" onchange="updateStatus(this, 6)">
+          <option value="todo">⬜ To Do</option>
+          <option value="progress">🔵 In Progress</option>
+          <option value="done">✅ Done</option>
+          <option value="skip">⏭ Skipped</option>
+        </select>
+      </td>
+      <td class="notes-cell"><input type="text" class="notes-input" placeholder="Add note..." onchange="saveNote(this, 6)"></td>
+    </tr>
+    <tr class="day-row foundation  " data-day="7" data-track="Foundation">
+      <td class="day-num">7</td>
+      <td class="date-cell"><span class="date-d">22 May</span><span class="date-dn">Fri</span></td>
+      <td class="phase-cell"><span class="phase-badge foundation">Phase 0</span></td>
+      <td class="track-cell"><span class="track-tag foundation">Foundation</span></td>
+      <td class="topic-cell"><strong>Tokens & Context Windows</strong><br><span class="concept">Tokenization, context limits, cost estimation</span></td>
+      <td class="reading-cell"><a href="https://platform.openai.com/tokenizer" target="_blank" rel="noopener" class="res-link">platform.openai.com/tokenizer</a></td>
+      <td class="task-cell">Count tokens in a long doc; calculate API cost estimate</td>
+      <td class="status-cell">
+        <select class="status-select" onchange="updateStatus(this, 7)">
+          <option value="todo">⬜ To Do</option>
+          <option value="progress">🔵 In Progress</option>
+          <option value="done">✅ Done</option>
+          <option value="skip">⏭ Skipped</option>
+        </select>
+      </td>
+      <td class="notes-cell"><input type="text" class="notes-input" placeholder="Add note..." onchange="saveNote(this, 7)"></td>
+    </tr>
+    <tr class="day-row foundation weekend " data-day="8" data-track="Foundation">
+      <td class="day-num">8</td>
+      <td class="date-cell"><span class="date-d">23 May</span><span class="date-dn">Sat</span></td>
+      <td class="phase-cell"><span class="phase-badge foundation">Phase 0</span></td>
+      <td class="track-cell"><span class="track-tag foundation">Foundation</span></td>
+      <td class="topic-cell"><strong>What Are Embeddings?</strong><br><span class="concept">Word vectors, semantic similarity, vector space</span></td>
+      <td class="reading-cell"><a href="https://jalammar.github.io/illustrated-word2vec" target="_blank" rel="noopener" class="res-link">jalammar.github.io/illustrated-word2vec</a></td>
+      <td class="task-cell">Manually compute cosine similarity between 2 sentences</td>
+      <td class="status-cell">
+        <select class="status-select" onchange="updateStatus(this, 8)">
+          <option value="todo">⬜ To Do</option>
+          <option value="progress">🔵 In Progress</option>
+          <option value="done">✅ Done</option>
+          <option value="skip">⏭ Skipped</option>
+        </select>
+      </td>
+      <td class="notes-cell"><input type="text" class="notes-input" placeholder="Add note..." onchange="saveNote(this, 8)"></td>
+    </tr>
+    <tr class="day-row foundation weekend " data-day="9" data-track="Foundation">
+      <td class="day-num">9</td>
+      <td class="date-cell"><span class="date-d">24 May</span><span class="date-dn">Sun</span></td>
+      <td class="phase-cell"><span class="phase-badge foundation">Phase 0</span></td>
+      <td class="track-cell"><span class="track-tag foundation">Foundation</span></td>
+      <td class="topic-cell"><strong>Generate Embeddings</strong><br><span class="concept">sentence-transformers, OpenAI text-embedding-3</span></td>
+      <td class="reading-cell"><a href="https://sbert.net/docs/pretrained_models.html" target="_blank" rel="noopener" class="res-link">sbert.net/docs/pretrained_models.html</a></td>
+      <td class="task-cell">Embed 10 sentences; find top-2 most similar pairs</td>
+      <td class="status-cell">
+        <select class="status-select" onchange="updateStatus(this, 9)">
+          <option value="todo">⬜ To Do</option>
+          <option value="progress">🔵 In Progress</option>
+          <option value="done">✅ Done</option>
+          <option value="skip">⏭ Skipped</option>
+        </select>
+      </td>
+      <td class="notes-cell"><input type="text" class="notes-input" placeholder="Add note..." onchange="saveNote(this, 9)"></td>
+    </tr>
+    <tr class="day-row foundation  " data-day="10" data-track="Foundation">
+      <td class="day-num">10</td>
+      <td class="date-cell"><span class="date-d">25 May</span><span class="date-dn">Mon</span></td>
+      <td class="phase-cell"><span class="phase-badge foundation">Phase 0</span></td>
+      <td class="track-cell"><span class="track-tag foundation">Foundation</span></td>
+      <td class="topic-cell"><strong>Mini-Project #1</strong><br><span class="concept">Consolidate weeks 1-2 knowledge</span></td>
+      <td class="reading-cell"><a href="https://Review notes from days 1-9" target="_blank" rel="noopener" class="res-link">Review notes from days 1-9</a></td>
+      <td class="task-cell">Build: CLI FAQ bot — embed question, find closest answer</td>
+      <td class="status-cell">
+        <select class="status-select" onchange="updateStatus(this, 10)">
+          <option value="todo">⬜ To Do</option>
+          <option value="progress">🔵 In Progress</option>
+          <option value="done">✅ Done</option>
+          <option value="skip">⏭ Skipped</option>
+        </select>
+      </td>
+      <td class="notes-cell"><input type="text" class="notes-input" placeholder="Add note..." onchange="saveNote(this, 10)"></td>
+    </tr>
+    <tr class="day-row rag  " data-day="11" data-track="RAG">
+      <td class="day-num">11</td>
+      <td class="date-cell"><span class="date-d">26 May</span><span class="date-dn">Tue</span></td>
+      <td class="phase-cell"><span class="phase-badge rag">Phase 1</span></td>
+      <td class="track-cell"><span class="track-tag rag">RAG</span></td>
+      <td class="topic-cell"><strong>Naive RAG Overview</strong><br><span class="concept">load → chunk → embed → store → retrieve → generate pipeline</span></td>
+      <td class="reading-cell"><a href="https://python.langchain.com/docs/concepts/rag" target="_blank" rel="noopener" class="res-link">python.langchain.com/docs/concepts/rag</a></td>
+      <td class="task-cell">Draw the pipeline diagram; label each component</td>
+      <td class="status-cell">
+        <select class="status-select" onchange="updateStatus(this, 11)">
+          <option value="todo">⬜ To Do</option>
+          <option value="progress">🔵 In Progress</option>
+          <option value="done">✅ Done</option>
+          <option value="skip">⏭ Skipped</option>
+        </select>
+      </td>
+      <td class="notes-cell"><input type="text" class="notes-input" placeholder="Add note..." onchange="saveNote(this, 11)"></td>
+    </tr>
+    <tr class="day-row rag  " data-day="12" data-track="RAG">
+      <td class="day-num">12</td>
+      <td class="date-cell"><span class="date-d">27 May</span><span class="date-dn">Wed</span></td>
+      <td class="phase-cell"><span class="phase-badge rag">Phase 1</span></td>
+      <td class="track-cell"><span class="track-tag rag">RAG</span></td>
+      <td class="topic-cell"><strong>Document Loaders</strong><br><span class="concept">PDFLoader, WebBaseLoader, TextLoader in LangChain</span></td>
+      <td class="reading-cell"><a href="https://python.langchain.com/docs/integrations/document_loaders" target="_blank" rel="noopener" class="res-link">python.langchain.com/docs/integrations/document_loaders</a></td>
+      <td class="task-cell">Load a PDF + webpage; inspect the Document objects</td>
+      <td class="status-cell">
+        <select class="status-select" onchange="updateStatus(this, 12)">
+          <option value="todo">⬜ To Do</option>
+          <option value="progress">🔵 In Progress</option>
+          <option value="done">✅ Done</option>
+          <option value="skip">⏭ Skipped</option>
+        </select>
+      </td>
+      <td class="notes-cell"><input type="text" class="notes-input" placeholder="Add note..." onchange="saveNote(this, 12)"></td>
+    </tr>
+    <tr class="day-row rag  " data-day="13" data-track="RAG">
+      <td class="day-num">13</td>
+      <td class="date-cell"><span class="date-d">28 May</span><span class="date-dn">Thu</span></td>
+      <td class="phase-cell"><span class="phase-badge rag">Phase 1</span></td>
+      <td class="track-cell"><span class="track-tag rag">RAG</span></td>
+      <td class="topic-cell"><strong>Text Splitting</strong><br><span class="concept">RecursiveCharacterTextSplitter, chunk size vs overlap</span></td>
+      <td class="reading-cell"><a href="https://python.langchain.com/docs/concepts/text_splitters" target="_blank" rel="noopener" class="res-link">python.langchain.com/docs/concepts/text_splitters</a></td>
+      <td class="task-cell">Experiment: chunk sizes 256/512/1024; compare retrieval quality</td>
+      <td class="status-cell">
+        <select class="status-select" onchange="updateStatus(this, 13)">
+          <option value="todo">⬜ To Do</option>
+          <option value="progress">🔵 In Progress</option>
+          <option value="done">✅ Done</option>
+          <option value="skip">⏭ Skipped</option>
+        </select>
+      </td>
+      <td class="notes-cell"><input type="text" class="notes-input" placeholder="Add note..." onchange="saveNote(this, 13)"></td>
+    </tr>
+    <tr class="day-row rag  " data-day="14" data-track="RAG">
+      <td class="day-num">14</td>
+      <td class="date-cell"><span class="date-d">29 May</span><span class="date-dn">Fri</span></td>
+      <td class="phase-cell"><span class="phase-badge rag">Phase 1</span></td>
+      <td class="track-cell"><span class="track-tag rag">RAG</span></td>
+      <td class="topic-cell"><strong>FAISS Vector Store</strong><br><span class="concept">Build local FAISS index; add docs; similarity search</span></td>
+      <td class="reading-cell"><a href="https://github.com/facebookresearch/faiss/wiki" target="_blank" rel="noopener" class="res-link">github.com/facebookresearch/faiss/wiki</a></td>
+      <td class="task-cell">Index 50 Wikipedia paragraphs; query with 5 questions</td>
+      <td class="status-cell">
+        <select class="status-select" onchange="updateStatus(this, 14)">
+          <option value="todo">⬜ To Do</option>
+          <option value="progress">🔵 In Progress</option>
+          <option value="done">✅ Done</option>
+          <option value="skip">⏭ Skipped</option>
+        </select>
+      </td>
+      <td class="notes-cell"><input type="text" class="notes-input" placeholder="Add note..." onchange="saveNote(this, 14)"></td>
+    </tr>
+    <tr class="day-row rag weekend " data-day="15" data-track="RAG">
+      <td class="day-num">15</td>
+      <td class="date-cell"><span class="date-d">30 May</span><span class="date-dn">Sat</span></td>
+      <td class="phase-cell"><span class="phase-badge rag">Phase 1</span></td>
+      <td class="track-cell"><span class="track-tag rag">RAG</span></td>
+      <td class="topic-cell"><strong>End-to-End Naive RAG</strong><br><span class="concept">Wire loader→splitter→FAISS→LLM into working chain</span></td>
+      <td class="reading-cell"><a href="https://python.langchain.com/docs/tutorials/rag" target="_blank" rel="noopener" class="res-link">python.langchain.com/docs/tutorials/rag</a></td>
+      <td class="task-cell">Build: Ask-my-PDF tool; test with a real PDF</td>
+      <td class="status-cell">
+        <select class="status-select" onchange="updateStatus(this, 15)">
+          <option value="todo">⬜ To Do</option>
+          <option value="progress">🔵 In Progress</option>
+          <option value="done">✅ Done</option>
+          <option value="skip">⏭ Skipped</option>
+        </select>
+      </td>
+      <td class="notes-cell"><input type="text" class="notes-input" placeholder="Add note..." onchange="saveNote(this, 15)"></td>
+    </tr>
+    <tr class="day-row rag weekend " data-day="16" data-track="RAG">
+      <td class="day-num">16</td>
+      <td class="date-cell"><span class="date-d">31 May</span><span class="date-dn">Sun</span></td>
+      <td class="phase-cell"><span class="phase-badge rag">Phase 1</span></td>
+      <td class="track-cell"><span class="track-tag rag">RAG</span></td>
+      <td class="topic-cell"><strong>ChromaDB</strong><br><span class="concept">Persistent vector store, metadata, collections</span></td>
+      <td class="reading-cell"><a href="https://docs.trychroma.com" target="_blank" rel="noopener" class="res-link">docs.trychroma.com</a></td>
+      <td class="task-cell">Replace FAISS with ChromaDB; add metadata to each chunk</td>
+      <td class="status-cell">
+        <select class="status-select" onchange="updateStatus(this, 16)">
+          <option value="todo">⬜ To Do</option>
+          <option value="progress">🔵 In Progress</option>
+          <option value="done">✅ Done</option>
+          <option value="skip">⏭ Skipped</option>
+        </select>
+      </td>
+      <td class="notes-cell"><input type="text" class="notes-input" placeholder="Add note..." onchange="saveNote(this, 16)"></td>
+    </tr>
+    <tr class="day-row rag  " data-day="17" data-track="RAG">
+      <td class="day-num">17</td>
+      <td class="date-cell"><span class="date-d">01 Jun</span><span class="date-dn">Mon</span></td>
+      <td class="phase-cell"><span class="phase-badge rag">Phase 1</span></td>
+      <td class="track-cell"><span class="track-tag rag">RAG</span></td>
+      <td class="topic-cell"><strong>Hybrid Search</strong><br><span class="concept">BM25 keyword + vector search fusion (RRF)</span></td>
+      <td class="reading-cell"><a href="https://pinecone.io/learn/hybrid-search" target="_blank" rel="noopener" class="res-link">pinecone.io/learn/hybrid-search</a></td>
+      <td class="task-cell">Implement BM25+vector using LangChain EnsembleRetriever</td>
+      <td class="status-cell">
+        <select class="status-select" onchange="updateStatus(this, 17)">
+          <option value="todo">⬜ To Do</option>
+          <option value="progress">🔵 In Progress</option>
+          <option value="done">✅ Done</option>
+          <option value="skip">⏭ Skipped</option>
+        </select>
+      </td>
+      <td class="notes-cell"><input type="text" class="notes-input" placeholder="Add note..." onchange="saveNote(this, 17)"></td>
+    </tr>
+    <tr class="day-row rag  " data-day="18" data-track="RAG">
+      <td class="day-num">18</td>
+      <td class="date-cell"><span class="date-d">02 Jun</span><span class="date-dn">Tue</span></td>
+      <td class="phase-cell"><span class="phase-badge rag">Phase 1</span></td>
+      <td class="track-cell"><span class="track-tag rag">RAG</span></td>
+      <td class="topic-cell"><strong>Pinecone Cloud DB</strong><br><span class="concept">Serverless vector DB, upsert, query, metadata filter</span></td>
+      <td class="reading-cell"><a href="https://docs.pinecone.io/guides/get-started/quickstart" target="_blank" rel="noopener" class="res-link">docs.pinecone.io/guides/get-started/quickstart</a></td>
+      <td class="task-cell">Create Pinecone index; migrate ChromaDB data; test queries</td>
+      <td class="status-cell">
+        <select class="status-select" onchange="updateStatus(this, 18)">
+          <option value="todo">⬜ To Do</option>
+          <option value="progress">🔵 In Progress</option>
+          <option value="done">✅ Done</option>
+          <option value="skip">⏭ Skipped</option>
+        </select>
+      </td>
+      <td class="notes-cell"><input type="text" class="notes-input" placeholder="Add note..." onchange="saveNote(this, 18)"></td>
+    </tr>
+    <tr class="day-row rag  " data-day="19" data-track="RAG">
+      <td class="day-num">19</td>
+      <td class="date-cell"><span class="date-d">03 Jun</span><span class="date-dn">Wed</span></td>
+      <td class="phase-cell"><span class="phase-badge rag">Phase 1</span></td>
+      <td class="track-cell"><span class="track-tag rag">RAG</span></td>
+      <td class="topic-cell"><strong>Qdrant & pgvector</strong><br><span class="concept">OSS options; run Qdrant locally via Docker</span></td>
+      <td class="reading-cell"><a href="https://qdrant.tech/documentation" target="_blank" rel="noopener" class="res-link">qdrant.tech/documentation</a></td>
+      <td class="task-cell">Run Qdrant in Docker; index 100 docs; benchmark speed</td>
+      <td class="status-cell">
+        <select class="status-select" onchange="updateStatus(this, 19)">
+          <option value="todo">⬜ To Do</option>
+          <option value="progress">🔵 In Progress</option>
+          <option value="done">✅ Done</option>
+          <option value="skip">⏭ Skipped</option>
+        </select>
+      </td>
+      <td class="notes-cell"><input type="text" class="notes-input" placeholder="Add note..." onchange="saveNote(this, 19)"></td>
+    </tr>
+    <tr class="day-row rag  " data-day="20" data-track="RAG">
+      <td class="day-num">20</td>
+      <td class="date-cell"><span class="date-d">04 Jun</span><span class="date-dn">Thu</span></td>
+      <td class="phase-cell"><span class="phase-badge rag">Phase 1</span></td>
+      <td class="track-cell"><span class="track-tag rag">RAG</span></td>
+      <td class="topic-cell"><strong>Query Rewriting</strong><br><span class="concept">Rewrite user queries with LLM before retrieval</span></td>
+      <td class="reading-cell"><a href="https://arxiv.org/abs/2402.03367" target="_blank" rel="noopener" class="res-link">arxiv.org/abs/2402.03367</a></td>
+      <td class="task-cell">Implement: LLM rewrites query → compare vs original retrieval</td>
+      <td class="status-cell">
+        <select class="status-select" onchange="updateStatus(this, 20)">
+          <option value="todo">⬜ To Do</option>
+          <option value="progress">🔵 In Progress</option>
+          <option value="done">✅ Done</option>
+          <option value="skip">⏭ Skipped</option>
+        </select>
+      </td>
+      <td class="notes-cell"><input type="text" class="notes-input" placeholder="Add note..." onchange="saveNote(this, 20)"></td>
+    </tr>
+    <tr class="day-row rag  " data-day="21" data-track="RAG">
+      <td class="day-num">21</td>
+      <td class="date-cell"><span class="date-d">05 Jun</span><span class="date-dn">Fri</span></td>
+      <td class="phase-cell"><span class="phase-badge rag">Phase 1</span></td>
+      <td class="track-cell"><span class="track-tag rag">RAG</span></td>
+      <td class="topic-cell"><strong>Multi-Query Retriever</strong><br><span class="concept">Generate N query variants; union docs; deduplicate</span></td>
+      <td class="reading-cell"><a href="https://python.langchain.com/docs/how_to/MultiQueryRetriever" target="_blank" rel="noopener" class="res-link">python.langchain.com/docs/how_to/MultiQueryRetriever</a></td>
+      <td class="task-cell">Build multi-query retriever; visualise sub-query chunks</td>
+      <td class="status-cell">
+        <select class="status-select" onchange="updateStatus(this, 21)">
+          <option value="todo">⬜ To Do</option>
+          <option value="progress">🔵 In Progress</option>
+          <option value="done">✅ Done</option>
+          <option value="skip">⏭ Skipped</option>
+        </select>
+      </td>
+      <td class="notes-cell"><input type="text" class="notes-input" placeholder="Add note..." onchange="saveNote(this, 21)"></td>
+    </tr>
+    <tr class="day-row rag weekend " data-day="22" data-track="RAG">
+      <td class="day-num">22</td>
+      <td class="date-cell"><span class="date-d">06 Jun</span><span class="date-dn">Sat</span></td>
+      <td class="phase-cell"><span class="phase-badge rag">Phase 1</span></td>
+      <td class="track-cell"><span class="track-tag rag">RAG</span></td>
+      <td class="topic-cell"><strong>HyDE</strong><br><span class="concept">LLM generates hypothetical answer; embed it; retrieve</span></td>
+      <td class="reading-cell"><a href="https://arxiv.org/abs/2212.10496" target="_blank" rel="noopener" class="res-link">arxiv.org/abs/2212.10496</a></td>
+      <td class="task-cell">Implement HyDE; compare recall vs standard retrieval on 20 queries</td>
+      <td class="status-cell">
+        <select class="status-select" onchange="updateStatus(this, 22)">
+          <option value="todo">⬜ To Do</option>
+          <option value="progress">🔵 In Progress</option>
+          <option value="done">✅ Done</option>
+          <option value="skip">⏭ Skipped</option>
+        </select>
+      </td>
+      <td class="notes-cell"><input type="text" class="notes-input" placeholder="Add note..." onchange="saveNote(this, 22)"></td>
+    </tr>
+    <tr class="day-row rag weekend " data-day="23" data-track="RAG">
+      <td class="day-num">23</td>
+      <td class="date-cell"><span class="date-d">07 Jun</span><span class="date-dn">Sun</span></td>
+      <td class="phase-cell"><span class="phase-badge rag">Phase 1</span></td>
+      <td class="track-cell"><span class="track-tag rag">RAG</span></td>
+      <td class="topic-cell"><strong>Cross-Encoder Re-ranking</strong><br><span class="concept">Use ms-marco-MiniLM to re-rank top-k results</span></td>
+      <td class="reading-cell"><a href="https://sbert.net/examples/applications/cross-encoder/README" target="_blank" rel="noopener" class="res-link">sbert.net/examples/applications/cross-encoder/README</a></td>
+      <td class="task-cell">Add re-ranking; measure precision@5 before vs after</td>
+      <td class="status-cell">
+        <select class="status-select" onchange="updateStatus(this, 23)">
+          <option value="todo">⬜ To Do</option>
+          <option value="progress">🔵 In Progress</option>
+          <option value="done">✅ Done</option>
+          <option value="skip">⏭ Skipped</option>
+        </select>
+      </td>
+      <td class="notes-cell"><input type="text" class="notes-input" placeholder="Add note..." onchange="saveNote(this, 23)"></td>
+    </tr>
+    <tr class="day-row rag  " data-day="24" data-track="RAG">
+      <td class="day-num">24</td>
+      <td class="date-cell"><span class="date-d">08 Jun</span><span class="date-dn">Mon</span></td>
+      <td class="phase-cell"><span class="phase-badge rag">Phase 1</span></td>
+      <td class="track-cell"><span class="track-tag rag">RAG</span></td>
+      <td class="topic-cell"><strong>Parent-Child Chunking</strong><br><span class="concept">Small chunks for retrieval; large parents for context</span></td>
+      <td class="reading-cell"><a href="https://python.langchain.com/docs/how_to/parent_document_retriever" target="_blank" rel="noopener" class="res-link">python.langchain.com/docs/how_to/parent_document_retriever</a></td>
+      <td class="task-cell">Implement parent-child; show answers use broader context</td>
+      <td class="status-cell">
+        <select class="status-select" onchange="updateStatus(this, 24)">
+          <option value="todo">⬜ To Do</option>
+          <option value="progress">🔵 In Progress</option>
+          <option value="done">✅ Done</option>
+          <option value="skip">⏭ Skipped</option>
+        </select>
+      </td>
+      <td class="notes-cell"><input type="text" class="notes-input" placeholder="Add note..." onchange="saveNote(this, 24)"></td>
+    </tr>
+    <tr class="day-row rag  " data-day="25" data-track="RAG">
+      <td class="day-num">25</td>
+      <td class="date-cell"><span class="date-d">09 Jun</span><span class="date-dn">Tue</span></td>
+      <td class="phase-cell"><span class="phase-badge rag">Phase 1</span></td>
+      <td class="track-cell"><span class="track-tag rag">RAG</span></td>
+      <td class="topic-cell"><strong>Contextual Compression</strong><br><span class="concept">Filter irrelevant sentences before LLM</span></td>
+      <td class="reading-cell"><a href="https://python.langchain.com/docs/how_to/contextual_compression" target="_blank" rel="noopener" class="res-link">python.langchain.com/docs/how_to/contextual_compression</a></td>
+      <td class="task-cell">Add compressor; compare token usage before/after</td>
+      <td class="status-cell">
+        <select class="status-select" onchange="updateStatus(this, 25)">
+          <option value="todo">⬜ To Do</option>
+          <option value="progress">🔵 In Progress</option>
+          <option value="done">✅ Done</option>
+          <option value="skip">⏭ Skipped</option>
+        </select>
+      </td>
+      <td class="notes-cell"><input type="text" class="notes-input" placeholder="Add note..." onchange="saveNote(this, 25)"></td>
+    </tr>
+    <tr class="day-row rag  " data-day="26" data-track="RAG">
+      <td class="day-num">26</td>
+      <td class="date-cell"><span class="date-d">10 Jun</span><span class="date-dn">Wed</span></td>
+      <td class="phase-cell"><span class="phase-badge rag">Phase 1</span></td>
+      <td class="track-cell"><span class="track-tag rag">RAG</span></td>
+      <td class="topic-cell"><strong>RAG Evaluation Metrics</strong><br><span class="concept">Faithfulness, answer relevance, context precision/recall</span></td>
+      <td class="reading-cell"><a href="https://arxiv.org/abs/2309.15217" target="_blank" rel="noopener" class="res-link">arxiv.org/abs/2309.15217</a></td>
+      <td class="task-cell">Read RAGAS paper; understand all 4 core metrics</td>
+      <td class="status-cell">
+        <select class="status-select" onchange="updateStatus(this, 26)">
+          <option value="todo">⬜ To Do</option>
+          <option value="progress">🔵 In Progress</option>
+          <option value="done">✅ Done</option>
+          <option value="skip">⏭ Skipped</option>
+        </select>
+      </td>
+      <td class="notes-cell"><input type="text" class="notes-input" placeholder="Add note..." onchange="saveNote(this, 26)"></td>
+    </tr>
+    <tr class="day-row rag  " data-day="27" data-track="RAG">
+      <td class="day-num">27</td>
+      <td class="date-cell"><span class="date-d">11 Jun</span><span class="date-dn">Thu</span></td>
+      <td class="phase-cell"><span class="phase-badge rag">Phase 1</span></td>
+      <td class="track-cell"><span class="track-tag rag">RAG</span></td>
+      <td class="topic-cell"><strong>RAGAS Framework</strong><br><span class="concept">Install ragas; create test set; score your pipeline</span></td>
+      <td class="reading-cell"><a href="https://docs.ragas.io" target="_blank" rel="noopener" class="res-link">docs.ragas.io</a></td>
+      <td class="task-cell">Evaluate Ask-my-PDF tool with RAGAS; get baseline scores</td>
+      <td class="status-cell">
+        <select class="status-select" onchange="updateStatus(this, 27)">
+          <option value="todo">⬜ To Do</option>
+          <option value="progress">🔵 In Progress</option>
+          <option value="done">✅ Done</option>
+          <option value="skip">⏭ Skipped</option>
+        </select>
+      </td>
+      <td class="notes-cell"><input type="text" class="notes-input" placeholder="Add note..." onchange="saveNote(this, 27)"></td>
+    </tr>
+    <tr class="day-row rag  " data-day="28" data-track="RAG">
+      <td class="day-num">28</td>
+      <td class="date-cell"><span class="date-d">12 Jun</span><span class="date-dn">Fri</span></td>
+      <td class="phase-cell"><span class="phase-badge rag">Phase 1</span></td>
+      <td class="track-cell"><span class="track-tag rag">RAG</span></td>
+      <td class="topic-cell"><strong>GraphRAG</strong><br><span class="concept">Knowledge-graph retrieval for multi-hop reasoning</span></td>
+      <td class="reading-cell"><a href="https://arxiv.org/abs/2404.16130" target="_blank" rel="noopener" class="res-link">arxiv.org/abs/2404.16130</a></td>
+      <td class="task-cell">Run Microsoft GraphRAG on small corpus; compare with naive RAG</td>
+      <td class="status-cell">
+        <select class="status-select" onchange="updateStatus(this, 28)">
+          <option value="todo">⬜ To Do</option>
+          <option value="progress">🔵 In Progress</option>
+          <option value="done">✅ Done</option>
+          <option value="skip">⏭ Skipped</option>
+        </select>
+      </td>
+      <td class="notes-cell"><input type="text" class="notes-input" placeholder="Add note..." onchange="saveNote(this, 28)"></td>
+    </tr>
+    <tr class="day-row rag weekend " data-day="29" data-track="RAG">
+      <td class="day-num">29</td>
+      <td class="date-cell"><span class="date-d">13 Jun</span><span class="date-dn">Sat</span></td>
+      <td class="phase-cell"><span class="phase-badge rag">Phase 1</span></td>
+      <td class="track-cell"><span class="track-tag rag">RAG</span></td>
+      <td class="topic-cell"><strong>RAPTOR</strong><br><span class="concept">Recursive abstractive processing with tree structure</span></td>
+      <td class="reading-cell"><a href="https://arxiv.org/abs/2401.18059" target="_blank" rel="noopener" class="res-link">arxiv.org/abs/2401.18059</a></td>
+      <td class="task-cell">Read RAPTOR paper; implement basic version with LlamaIndex</td>
+      <td class="status-cell">
+        <select class="status-select" onchange="updateStatus(this, 29)">
+          <option value="todo">⬜ To Do</option>
+          <option value="progress">🔵 In Progress</option>
+          <option value="done">✅ Done</option>
+          <option value="skip">⏭ Skipped</option>
+        </select>
+      </td>
+      <td class="notes-cell"><input type="text" class="notes-input" placeholder="Add note..." onchange="saveNote(this, 29)"></td>
+    </tr>
+    <tr class="day-row rag weekend project-row" data-day="30" data-track="RAG">
+      <td class="day-num">30</td>
+      <td class="date-cell"><span class="date-d">14 Jun</span><span class="date-dn">Sun</span></td>
+      <td class="phase-cell"><span class="phase-badge rag">Phase 1</span></td>
+      <td class="track-cell"><span class="track-tag rag">RAG</span></td>
+      <td class="topic-cell"><strong>Mini-Project #2 🏆</strong><br><span class="concept">Build production-quality RAG system end-to-end</span></td>
+      <td class="reading-cell"><a href="https://Review all Phase 1 notes" target="_blank" rel="noopener" class="res-link">Review all Phase 1 notes</a></td>
+      <td class="task-cell">Project: Research Assistant — 10 PDFs, hybrid search, re-rank, RAGAS eval</td>
+      <td class="status-cell">
+        <select class="status-select" onchange="updateStatus(this, 30)">
+          <option value="todo">⬜ To Do</option>
+          <option value="progress">🔵 In Progress</option>
+          <option value="done">✅ Done</option>
+          <option value="skip">⏭ Skipped</option>
+        </select>
+      </td>
+      <td class="notes-cell"><input type="text" class="notes-input" placeholder="Add note..." onchange="saveNote(this, 30)"></td>
+    </tr>
+    <tr class="day-row agent  " data-day="31" data-track="Agent">
+      <td class="day-num">31</td>
+      <td class="date-cell"><span class="date-d">15 Jun</span><span class="date-dn">Mon</span></td>
+      <td class="phase-cell"><span class="phase-badge agent">Phase 2</span></td>
+      <td class="track-cell"><span class="track-tag agent">Agent</span></td>
+      <td class="topic-cell"><strong>What Is an Agent?</strong><br><span class="concept">ReAct pattern: Thought→Action→Observation loop</span></td>
+      <td class="reading-cell"><a href="https://arxiv.org/abs/2210.03629" target="_blank" rel="noopener" class="res-link">arxiv.org/abs/2210.03629</a></td>
+      <td class="task-cell">Read ReAct paper; trace 3 Thought-Action-Observation steps</td>
+      <td class="status-cell">
+        <select class="status-select" onchange="updateStatus(this, 31)">
+          <option value="todo">⬜ To Do</option>
+          <option value="progress">🔵 In Progress</option>
+          <option value="done">✅ Done</option>
+          <option value="skip">⏭ Skipped</option>
+        </select>
+      </td>
+      <td class="notes-cell"><input type="text" class="notes-input" placeholder="Add note..." onchange="saveNote(this, 31)"></td>
+    </tr>
+    <tr class="day-row agent  " data-day="32" data-track="Agent">
+      <td class="day-num">32</td>
+      <td class="date-cell"><span class="date-d">16 Jun</span><span class="date-dn">Tue</span></td>
+      <td class="phase-cell"><span class="phase-badge agent">Phase 2</span></td>
+      <td class="track-cell"><span class="track-tag agent">Agent</span></td>
+      <td class="topic-cell"><strong>Tool / Function Calling</strong><br><span class="concept">OpenAI/Anthropic tool use JSON schema</span></td>
+      <td class="reading-cell"><a href="https://docs.anthropic.com/en/docs/build-with-claude/tool-use" target="_blank" rel="noopener" class="res-link">docs.anthropic.com/en/docs/build-with-claude/tool-use</a></td>
+      <td class="task-cell">Build: calculator agent with add/subtract/multiply tools</td>
+      <td class="status-cell">
+        <select class="status-select" onchange="updateStatus(this, 32)">
+          <option value="todo">⬜ To Do</option>
+          <option value="progress">🔵 In Progress</option>
+          <option value="done">✅ Done</option>
+          <option value="skip">⏭ Skipped</option>
+        </select>
+      </td>
+      <td class="notes-cell"><input type="text" class="notes-input" placeholder="Add note..." onchange="saveNote(this, 32)"></td>
+    </tr>
+    <tr class="day-row agent  " data-day="33" data-track="Agent">
+      <td class="day-num">33</td>
+      <td class="date-cell"><span class="date-d">17 Jun</span><span class="date-dn">Wed</span></td>
+      <td class="phase-cell"><span class="phase-badge agent">Phase 2</span></td>
+      <td class="track-cell"><span class="track-tag agent">Agent</span></td>
+      <td class="topic-cell"><strong>LangChain AgentExecutor</strong><br><span class="concept">Tools list, AgentExecutor, verbose tracing</span></td>
+      <td class="reading-cell"><a href="https://python.langchain.com/docs/concepts/agents" target="_blank" rel="noopener" class="res-link">python.langchain.com/docs/concepts/agents</a></td>
+      <td class="task-cell">Build web-search + calculator agent with AgentExecutor</td>
+      <td class="status-cell">
+        <select class="status-select" onchange="updateStatus(this, 33)">
+          <option value="todo">⬜ To Do</option>
+          <option value="progress">🔵 In Progress</option>
+          <option value="done">✅ Done</option>
+          <option value="skip">⏭ Skipped</option>
+        </select>
+      </td>
+      <td class="notes-cell"><input type="text" class="notes-input" placeholder="Add note..." onchange="saveNote(this, 33)"></td>
+    </tr>
+    <tr class="day-row agent  " data-day="34" data-track="Agent">
+      <td class="day-num">34</td>
+      <td class="date-cell"><span class="date-d">18 Jun</span><span class="date-dn">Thu</span></td>
+      <td class="phase-cell"><span class="phase-badge agent">Phase 2</span></td>
+      <td class="track-cell"><span class="track-tag agent">Agent</span></td>
+      <td class="topic-cell"><strong>Building Custom Tools</strong><br><span class="concept">@tool decorator, StructuredTool, BaseTool class</span></td>
+      <td class="reading-cell"><a href="https://python.langchain.com/docs/how_to/custom_tools" target="_blank" rel="noopener" class="res-link">python.langchain.com/docs/how_to/custom_tools</a></td>
+      <td class="task-cell">Create 3 custom tools: get_weather, search_wikipedia, run_python</td>
+      <td class="status-cell">
+        <select class="status-select" onchange="updateStatus(this, 34)">
+          <option value="todo">⬜ To Do</option>
+          <option value="progress">🔵 In Progress</option>
+          <option value="done">✅ Done</option>
+          <option value="skip">⏭ Skipped</option>
+        </select>
+      </td>
+      <td class="notes-cell"><input type="text" class="notes-input" placeholder="Add note..." onchange="saveNote(this, 34)"></td>
+    </tr>
+    <tr class="day-row agent  " data-day="35" data-track="Agent">
+      <td class="day-num">35</td>
+      <td class="date-cell"><span class="date-d">19 Jun</span><span class="date-dn">Fri</span></td>
+      <td class="phase-cell"><span class="phase-badge agent">Phase 2</span></td>
+      <td class="track-cell"><span class="track-tag agent">Agent</span></td>
+      <td class="topic-cell"><strong>Agent Memory Basics</strong><br><span class="concept">ConversationBufferMemory, chat history in agents</span></td>
+      <td class="reading-cell"><a href="https://python.langchain.com/docs/concepts/memory" target="_blank" rel="noopener" class="res-link">python.langchain.com/docs/concepts/memory</a></td>
+      <td class="task-cell">Add multi-turn memory; test 5-turn conversation</td>
+      <td class="status-cell">
+        <select class="status-select" onchange="updateStatus(this, 35)">
+          <option value="todo">⬜ To Do</option>
+          <option value="progress">🔵 In Progress</option>
+          <option value="done">✅ Done</option>
+          <option value="skip">⏭ Skipped</option>
+        </select>
+      </td>
+      <td class="notes-cell"><input type="text" class="notes-input" placeholder="Add note..." onchange="saveNote(this, 35)"></td>
+    </tr>
+    <tr class="day-row agent weekend " data-day="36" data-track="Agent">
+      <td class="day-num">36</td>
+      <td class="date-cell"><span class="date-d">20 Jun</span><span class="date-dn">Sat</span></td>
+      <td class="phase-cell"><span class="phase-badge agent">Phase 2</span></td>
+      <td class="track-cell"><span class="track-tag agent">Agent</span></td>
+      <td class="topic-cell"><strong>External Vector Memory</strong><br><span class="concept">Store past conversations in ChromaDB; retrieve relevant ones</span></td>
+      <td class="reading-cell"><a href="https://arxiv.org/abs/2310.08560" target="_blank" rel="noopener" class="res-link">arxiv.org/abs/2310.08560</a></td>
+      <td class="task-cell">Implement: agent retrieves relevant memories from past sessions</td>
+      <td class="status-cell">
+        <select class="status-select" onchange="updateStatus(this, 36)">
+          <option value="todo">⬜ To Do</option>
+          <option value="progress">🔵 In Progress</option>
+          <option value="done">✅ Done</option>
+          <option value="skip">⏭ Skipped</option>
+        </select>
+      </td>
+      <td class="notes-cell"><input type="text" class="notes-input" placeholder="Add note..." onchange="saveNote(this, 36)"></td>
+    </tr>
+    <tr class="day-row agent weekend " data-day="37" data-track="Agent">
+      <td class="day-num">37</td>
+      <td class="date-cell"><span class="date-d">21 Jun</span><span class="date-dn">Sun</span></td>
+      <td class="phase-cell"><span class="phase-badge agent">Phase 2</span></td>
+      <td class="track-cell"><span class="track-tag agent">Agent</span></td>
+      <td class="topic-cell"><strong>Chain-of-Thought Prompting</strong><br><span class="concept">Zero-shot CoT, few-shot CoT, structured reasoning</span></td>
+      <td class="reading-cell"><a href="https://arxiv.org/abs/2201.11903" target="_blank" rel="noopener" class="res-link">arxiv.org/abs/2201.11903</a></td>
+      <td class="task-cell">Compare agent outputs with/without CoT on 5 math word problems</td>
+      <td class="status-cell">
+        <select class="status-select" onchange="updateStatus(this, 37)">
+          <option value="todo">⬜ To Do</option>
+          <option value="progress">🔵 In Progress</option>
+          <option value="done">✅ Done</option>
+          <option value="skip">⏭ Skipped</option>
+        </select>
+      </td>
+      <td class="notes-cell"><input type="text" class="notes-input" placeholder="Add note..." onchange="saveNote(this, 37)"></td>
+    </tr>
+    <tr class="day-row agent  " data-day="38" data-track="Agent">
+      <td class="day-num">38</td>
+      <td class="date-cell"><span class="date-d">22 Jun</span><span class="date-dn">Mon</span></td>
+      <td class="phase-cell"><span class="phase-badge agent">Phase 2</span></td>
+      <td class="track-cell"><span class="track-tag agent">Agent</span></td>
+      <td class="topic-cell"><strong>Tree-of-Thought</strong><br><span class="concept">Explore multiple reasoning branches; score; backtrack</span></td>
+      <td class="reading-cell"><a href="https://arxiv.org/abs/2305.10601" target="_blank" rel="noopener" class="res-link">arxiv.org/abs/2305.10601</a></td>
+      <td class="task-cell">Implement simple ToT for a logic puzzle; visualise the tree</td>
+      <td class="status-cell">
+        <select class="status-select" onchange="updateStatus(this, 38)">
+          <option value="todo">⬜ To Do</option>
+          <option value="progress">🔵 In Progress</option>
+          <option value="done">✅ Done</option>
+          <option value="skip">⏭ Skipped</option>
+        </select>
+      </td>
+      <td class="notes-cell"><input type="text" class="notes-input" placeholder="Add note..." onchange="saveNote(this, 38)"></td>
+    </tr>
+    <tr class="day-row agent  " data-day="39" data-track="Agent">
+      <td class="day-num">39</td>
+      <td class="date-cell"><span class="date-d">23 Jun</span><span class="date-dn">Tue</span></td>
+      <td class="phase-cell"><span class="phase-badge agent">Phase 2</span></td>
+      <td class="track-cell"><span class="track-tag agent">Agent</span></td>
+      <td class="topic-cell"><strong>Plan-and-Execute</strong><br><span class="concept">Planner LLM creates step plan; Executor LLM runs each step</span></td>
+      <td class="reading-cell"><a href="https://python.langchain.com/docs/how_to/plan_and_execute" target="_blank" rel="noopener" class="res-link">python.langchain.com/docs/how_to/plan_and_execute</a></td>
+      <td class="task-cell">Build plan-and-execute agent: 'Research AI news and summarise'</td>
+      <td class="status-cell">
+        <select class="status-select" onchange="updateStatus(this, 39)">
+          <option value="todo">⬜ To Do</option>
+          <option value="progress">🔵 In Progress</option>
+          <option value="done">✅ Done</option>
+          <option value="skip">⏭ Skipped</option>
+        </select>
+      </td>
+      <td class="notes-cell"><input type="text" class="notes-input" placeholder="Add note..." onchange="saveNote(this, 39)"></td>
+    </tr>
+    <tr class="day-row agent  " data-day="40" data-track="Agent">
+      <td class="day-num">40</td>
+      <td class="date-cell"><span class="date-d">24 Jun</span><span class="date-dn">Wed</span></td>
+      <td class="phase-cell"><span class="phase-badge agent">Phase 2</span></td>
+      <td class="track-cell"><span class="track-tag agent">Agent</span></td>
+      <td class="topic-cell"><strong>Self-Reflection / Reflexion</strong><br><span class="concept">Agent critiques its output; revises; loops until good</span></td>
+      <td class="reading-cell"><a href="https://arxiv.org/abs/2303.11366" target="_blank" rel="noopener" class="res-link">arxiv.org/abs/2303.11366</a></td>
+      <td class="task-cell">Add self-critique loop; compare final output quality</td>
+      <td class="status-cell">
+        <select class="status-select" onchange="updateStatus(this, 40)">
+          <option value="todo">⬜ To Do</option>
+          <option value="progress">🔵 In Progress</option>
+          <option value="done">✅ Done</option>
+          <option value="skip">⏭ Skipped</option>
+        </select>
+      </td>
+      <td class="notes-cell"><input type="text" class="notes-input" placeholder="Add note..." onchange="saveNote(this, 40)"></td>
+    </tr>
+    <tr class="day-row agent  " data-day="41" data-track="Agent">
+      <td class="day-num">41</td>
+      <td class="date-cell"><span class="date-d">25 Jun</span><span class="date-dn">Thu</span></td>
+      <td class="phase-cell"><span class="phase-badge agent">Phase 2</span></td>
+      <td class="track-cell"><span class="track-tag agent">Agent</span></td>
+      <td class="topic-cell"><strong>Structured Outputs</strong><br><span class="concept">Pydantic models, instructor library, JSON mode</span></td>
+      <td class="reading-cell"><a href="https://python.useinstructor.com" target="_blank" rel="noopener" class="res-link">python.useinstructor.com</a></td>
+      <td class="task-cell">Force agent to output structured Pydantic model for all responses</td>
+      <td class="status-cell">
+        <select class="status-select" onchange="updateStatus(this, 41)">
+          <option value="todo">⬜ To Do</option>
+          <option value="progress">🔵 In Progress</option>
+          <option value="done">✅ Done</option>
+          <option value="skip">⏭ Skipped</option>
+        </select>
+      </td>
+      <td class="notes-cell"><input type="text" class="notes-input" placeholder="Add note..." onchange="saveNote(this, 41)"></td>
+    </tr>
+    <tr class="day-row agent  " data-day="42" data-track="Agent">
+      <td class="day-num">42</td>
+      <td class="date-cell"><span class="date-d">26 Jun</span><span class="date-dn">Fri</span></td>
+      <td class="phase-cell"><span class="phase-badge agent">Phase 2</span></td>
+      <td class="track-cell"><span class="track-tag agent">Agent</span></td>
+      <td class="topic-cell"><strong>Async Agents</strong><br><span class="concept">asyncio, aiohttp, parallel tool execution</span></td>
+      <td class="reading-cell"><a href="https://docs.python.org/3/library/asyncio.html" target="_blank" rel="noopener" class="res-link">docs.python.org/3/library/asyncio.html</a></td>
+      <td class="task-cell">Refactor agent to run 3 tool calls in parallel</td>
+      <td class="status-cell">
+        <select class="status-select" onchange="updateStatus(this, 42)">
+          <option value="todo">⬜ To Do</option>
+          <option value="progress">🔵 In Progress</option>
+          <option value="done">✅ Done</option>
+          <option value="skip">⏭ Skipped</option>
+        </select>
+      </td>
+      <td class="notes-cell"><input type="text" class="notes-input" placeholder="Add note..." onchange="saveNote(this, 42)"></td>
+    </tr>
+    <tr class="day-row agent weekend " data-day="43" data-track="Agent">
+      <td class="day-num">43</td>
+      <td class="date-cell"><span class="date-d">27 Jun</span><span class="date-dn">Sat</span></td>
+      <td class="phase-cell"><span class="phase-badge agent">Phase 2</span></td>
+      <td class="track-cell"><span class="track-tag agent">Agent</span></td>
+      <td class="topic-cell"><strong>Agent Evaluation</strong><br><span class="concept">Trajectory evaluation, tool-use accuracy, LLM-as-judge</span></td>
+      <td class="reading-cell"><a href="https://docs.smith.langchain.com" target="_blank" rel="noopener" class="res-link">docs.smith.langchain.com</a></td>
+      <td class="task-cell">Evaluate agent on 10 test cases using LangSmith</td>
+      <td class="status-cell">
+        <select class="status-select" onchange="updateStatus(this, 43)">
+          <option value="todo">⬜ To Do</option>
+          <option value="progress">🔵 In Progress</option>
+          <option value="done">✅ Done</option>
+          <option value="skip">⏭ Skipped</option>
+        </select>
+      </td>
+      <td class="notes-cell"><input type="text" class="notes-input" placeholder="Add note..." onchange="saveNote(this, 43)"></td>
+    </tr>
+    <tr class="day-row agent weekend " data-day="44" data-track="Agent">
+      <td class="day-num">44</td>
+      <td class="date-cell"><span class="date-d">28 Jun</span><span class="date-dn">Sun</span></td>
+      <td class="phase-cell"><span class="phase-badge agent">Phase 2</span></td>
+      <td class="track-cell"><span class="track-tag agent">Agent</span></td>
+      <td class="topic-cell"><strong>Safety & Guardrails</strong><br><span class="concept">Input/output guardrails, prompt injection, sandboxing</span></td>
+      <td class="reading-cell"><a href="https://owasp.org/www-project-top-10-for-large-language-model-applications" target="_blank" rel="noopener" class="res-link">owasp.org/www-project-top-10-for-large-language-model-applications</a></td>
+      <td class="task-cell">Add: input classifier, output validator, tool allowlist</td>
+      <td class="status-cell">
+        <select class="status-select" onchange="updateStatus(this, 44)">
+          <option value="todo">⬜ To Do</option>
+          <option value="progress">🔵 In Progress</option>
+          <option value="done">✅ Done</option>
+          <option value="skip">⏭ Skipped</option>
+        </select>
+      </td>
+      <td class="notes-cell"><input type="text" class="notes-input" placeholder="Add note..." onchange="saveNote(this, 44)"></td>
+    </tr>
+    <tr class="day-row agent  project-row" data-day="45" data-track="Agent">
+      <td class="day-num">45</td>
+      <td class="date-cell"><span class="date-d">29 Jun</span><span class="date-dn">Mon</span></td>
+      <td class="phase-cell"><span class="phase-badge agent">Phase 2</span></td>
+      <td class="track-cell"><span class="track-tag agent">Agent</span></td>
+      <td class="topic-cell"><strong>Mini-Project #3 🏆</strong><br><span class="concept">End-to-end autonomous agent with tools, memory, guardrails</span></td>
+      <td class="reading-cell"><a href="https://Review all Phase 2 notes" target="_blank" rel="noopener" class="res-link">Review all Phase 2 notes</a></td>
+      <td class="task-cell">Project: Research Agent — web search + Wikipedia + code exec + structured report</td>
+      <td class="status-cell">
+        <select class="status-select" onchange="updateStatus(this, 45)">
+          <option value="todo">⬜ To Do</option>
+          <option value="progress">🔵 In Progress</option>
+          <option value="done">✅ Done</option>
+          <option value="skip">⏭ Skipped</option>
+        </select>
+      </td>
+      <td class="notes-cell"><input type="text" class="notes-input" placeholder="Add note..." onchange="saveNote(this, 45)"></td>
+    </tr>
+    <tr class="day-row advanced  " data-day="46" data-track="Advanced">
+      <td class="day-num">46</td>
+      <td class="date-cell"><span class="date-d">30 Jun</span><span class="date-dn">Tue</span></td>
+      <td class="phase-cell"><span class="phase-badge advanced">Phase 3</span></td>
+      <td class="track-cell"><span class="track-tag advanced">Advanced</span></td>
+      <td class="topic-cell"><strong>Multi-Agent Concepts</strong><br><span class="concept">Supervisor/worker patterns, message passing, shared state</span></td>
+      <td class="reading-cell"><a href="https://arxiv.org/abs/2308.08155" target="_blank" rel="noopener" class="res-link">arxiv.org/abs/2308.08155</a></td>
+      <td class="task-cell">Read AutoGen paper; sketch a 3-agent system design</td>
+      <td class="status-cell">
+        <select class="status-select" onchange="updateStatus(this, 46)">
+          <option value="todo">⬜ To Do</option>
+          <option value="progress">🔵 In Progress</option>
+          <option value="done">✅ Done</option>
+          <option value="skip">⏭ Skipped</option>
+        </select>
+      </td>
+      <td class="notes-cell"><input type="text" class="notes-input" placeholder="Add note..." onchange="saveNote(this, 46)"></td>
+    </tr>
+    <tr class="day-row advanced  " data-day="47" data-track="Advanced">
+      <td class="day-num">47</td>
+      <td class="date-cell"><span class="date-d">01 Jul</span><span class="date-dn">Wed</span></td>
+      <td class="phase-cell"><span class="phase-badge advanced">Phase 3</span></td>
+      <td class="track-cell"><span class="track-tag advanced">Advanced</span></td>
+      <td class="topic-cell"><strong>LangGraph Basics</strong><br><span class="concept">StateGraph, nodes, edges, conditional branching</span></td>
+      <td class="reading-cell"><a href="https://langchain-ai.github.io/langgraph" target="_blank" rel="noopener" class="res-link">langchain-ai.github.io/langgraph</a></td>
+      <td class="task-cell">Build: 2-node LangGraph (planner → executor)</td>
+      <td class="status-cell">
+        <select class="status-select" onchange="updateStatus(this, 47)">
+          <option value="todo">⬜ To Do</option>
+          <option value="progress">🔵 In Progress</option>
+          <option value="done">✅ Done</option>
+          <option value="skip">⏭ Skipped</option>
+        </select>
+      </td>
+      <td class="notes-cell"><input type="text" class="notes-input" placeholder="Add note..." onchange="saveNote(this, 47)"></td>
+    </tr>
+    <tr class="day-row advanced  " data-day="48" data-track="Advanced">
+      <td class="day-num">48</td>
+      <td class="date-cell"><span class="date-d">02 Jul</span><span class="date-dn">Thu</span></td>
+      <td class="phase-cell"><span class="phase-badge advanced">Phase 3</span></td>
+      <td class="track-cell"><span class="track-tag advanced">Advanced</span></td>
+      <td class="topic-cell"><strong>LangGraph Advanced</strong><br><span class="concept">Checkpointing, human-in-the-loop, streaming, cycles</span></td>
+      <td class="reading-cell"><a href="https://langchain-ai.github.io/langgraph/how-tos" target="_blank" rel="noopener" class="res-link">langchain-ai.github.io/langgraph/how-tos</a></td>
+      <td class="task-cell">Add human approval checkpoint to your LangGraph agent</td>
+      <td class="status-cell">
+        <select class="status-select" onchange="updateStatus(this, 48)">
+          <option value="todo">⬜ To Do</option>
+          <option value="progress">🔵 In Progress</option>
+          <option value="done">✅ Done</option>
+          <option value="skip">⏭ Skipped</option>
+        </select>
+      </td>
+      <td class="notes-cell"><input type="text" class="notes-input" placeholder="Add note..." onchange="saveNote(this, 48)"></td>
+    </tr>
+    <tr class="day-row advanced  " data-day="49" data-track="Advanced">
+      <td class="day-num">49</td>
+      <td class="date-cell"><span class="date-d">03 Jul</span><span class="date-dn">Fri</span></td>
+      <td class="phase-cell"><span class="phase-badge advanced">Phase 3</span></td>
+      <td class="track-cell"><span class="track-tag advanced">Advanced</span></td>
+      <td class="topic-cell"><strong>AutoGen Framework</strong><br><span class="concept">ConversableAgent, GroupChat, coding agent, human proxy</span></td>
+      <td class="reading-cell"><a href="https://microsoft.github.io/autogen" target="_blank" rel="noopener" class="res-link">microsoft.github.io/autogen</a></td>
+      <td class="task-cell">Build: 3-agent AutoGen group (Planner, Coder, Critic)</td>
+      <td class="status-cell">
+        <select class="status-select" onchange="updateStatus(this, 49)">
+          <option value="todo">⬜ To Do</option>
+          <option value="progress">🔵 In Progress</option>
+          <option value="done">✅ Done</option>
+          <option value="skip">⏭ Skipped</option>
+        </select>
+      </td>
+      <td class="notes-cell"><input type="text" class="notes-input" placeholder="Add note..." onchange="saveNote(this, 49)"></td>
+    </tr>
+    <tr class="day-row advanced weekend " data-day="50" data-track="Advanced">
+      <td class="day-num">50</td>
+      <td class="date-cell"><span class="date-d">04 Jul</span><span class="date-dn">Sat</span></td>
+      <td class="phase-cell"><span class="phase-badge advanced">Phase 3</span></td>
+      <td class="track-cell"><span class="track-tag advanced">Advanced</span></td>
+      <td class="topic-cell"><strong>CrewAI Framework</strong><br><span class="concept">Crews, roles, tasks, sequential vs hierarchical process</span></td>
+      <td class="reading-cell"><a href="https://docs.crewai.com" target="_blank" rel="noopener" class="res-link">docs.crewai.com</a></td>
+      <td class="task-cell">Build: CrewAI research crew — Researcher, Writer, Editor</td>
+      <td class="status-cell">
+        <select class="status-select" onchange="updateStatus(this, 50)">
+          <option value="todo">⬜ To Do</option>
+          <option value="progress">🔵 In Progress</option>
+          <option value="done">✅ Done</option>
+          <option value="skip">⏭ Skipped</option>
+        </select>
+      </td>
+      <td class="notes-cell"><input type="text" class="notes-input" placeholder="Add note..." onchange="saveNote(this, 50)"></td>
+    </tr>
+    <tr class="day-row advanced weekend " data-day="51" data-track="Advanced">
+      <td class="day-num">51</td>
+      <td class="date-cell"><span class="date-d">05 Jul</span><span class="date-dn">Sun</span></td>
+      <td class="phase-cell"><span class="phase-badge advanced">Phase 3</span></td>
+      <td class="track-cell"><span class="track-tag advanced">Advanced</span></td>
+      <td class="topic-cell"><strong>Agentic RAG — Retrieval as Tool</strong><br><span class="concept">Give agents a search_knowledge_base tool; decide when to retrieve</span></td>
+      <td class="reading-cell"><a href="https://python.langchain.com/docs/tutorials/qa_chat_history" target="_blank" rel="noopener" class="res-link">python.langchain.com/docs/tutorials/qa_chat_history</a></td>
+      <td class="task-cell">Convert RAG system into a tool; integrate with ReAct agent</td>
+      <td class="status-cell">
+        <select class="status-select" onchange="updateStatus(this, 51)">
+          <option value="todo">⬜ To Do</option>
+          <option value="progress">🔵 In Progress</option>
+          <option value="done">✅ Done</option>
+          <option value="skip">⏭ Skipped</option>
+        </select>
+      </td>
+      <td class="notes-cell"><input type="text" class="notes-input" placeholder="Add note..." onchange="saveNote(this, 51)"></td>
+    </tr>
+    <tr class="day-row advanced  " data-day="52" data-track="Advanced">
+      <td class="day-num">52</td>
+      <td class="date-cell"><span class="date-d">06 Jul</span><span class="date-dn">Mon</span></td>
+      <td class="phase-cell"><span class="phase-badge advanced">Phase 3</span></td>
+      <td class="track-cell"><span class="track-tag advanced">Advanced</span></td>
+      <td class="topic-cell"><strong>Self-RAG</strong><br><span class="concept">LLM decides whether to retrieve; critiques retrieved docs</span></td>
+      <td class="reading-cell"><a href="https://arxiv.org/abs/2310.11511" target="_blank" rel="noopener" class="res-link">arxiv.org/abs/2310.11511</a></td>
+      <td class="task-cell">Implement Self-RAG with LangGraph: retrieve→critique→refine loop</td>
+      <td class="status-cell">
+        <select class="status-select" onchange="updateStatus(this, 52)">
+          <option value="todo">⬜ To Do</option>
+          <option value="progress">🔵 In Progress</option>
+          <option value="done">✅ Done</option>
+          <option value="skip">⏭ Skipped</option>
+        </select>
+      </td>
+      <td class="notes-cell"><input type="text" class="notes-input" placeholder="Add note..." onchange="saveNote(this, 52)"></td>
+    </tr>
+    <tr class="day-row advanced  " data-day="53" data-track="Advanced">
+      <td class="day-num">53</td>
+      <td class="date-cell"><span class="date-d">07 Jul</span><span class="date-dn">Tue</span></td>
+      <td class="phase-cell"><span class="phase-badge advanced">Phase 3</span></td>
+      <td class="track-cell"><span class="track-tag advanced">Advanced</span></td>
+      <td class="topic-cell"><strong>CRAG (Corrective RAG)</strong><br><span class="concept">Evaluate retrieval quality; fall back to web search if low</span></td>
+      <td class="reading-cell"><a href="https://arxiv.org/abs/2401.15884" target="_blank" rel="noopener" class="res-link">arxiv.org/abs/2401.15884</a></td>
+      <td class="task-cell">Implement CRAG: retrieval evaluator + web search fallback</td>
+      <td class="status-cell">
+        <select class="status-select" onchange="updateStatus(this, 53)">
+          <option value="todo">⬜ To Do</option>
+          <option value="progress">🔵 In Progress</option>
+          <option value="done">✅ Done</option>
+          <option value="skip">⏭ Skipped</option>
+        </select>
+      </td>
+      <td class="notes-cell"><input type="text" class="notes-input" placeholder="Add note..." onchange="saveNote(this, 53)"></td>
+    </tr>
+    <tr class="day-row advanced  " data-day="54" data-track="Advanced">
+      <td class="day-num">54</td>
+      <td class="date-cell"><span class="date-d">08 Jul</span><span class="date-dn">Wed</span></td>
+      <td class="phase-cell"><span class="phase-badge advanced">Phase 3</span></td>
+      <td class="track-cell"><span class="track-tag advanced">Advanced</span></td>
+      <td class="topic-cell"><strong>Routing & Query Classification</strong><br><span class="concept">Route query types to different retrieval strategies</span></td>
+      <td class="reading-cell"><a href="https://python.langchain.com/docs/how_to/routing" target="_blank" rel="noopener" class="res-link">python.langchain.com/docs/how_to/routing</a></td>
+      <td class="task-cell">Build router: factual→RAG, conversational→LLM, code→agent</td>
+      <td class="status-cell">
+        <select class="status-select" onchange="updateStatus(this, 54)">
+          <option value="todo">⬜ To Do</option>
+          <option value="progress">🔵 In Progress</option>
+          <option value="done">✅ Done</option>
+          <option value="skip">⏭ Skipped</option>
+        </select>
+      </td>
+      <td class="notes-cell"><input type="text" class="notes-input" placeholder="Add note..." onchange="saveNote(this, 54)"></td>
+    </tr>
+    <tr class="day-row advanced  project-row" data-day="55" data-track="Advanced">
+      <td class="day-num">55</td>
+      <td class="date-cell"><span class="date-d">09 Jul</span><span class="date-dn">Thu</span></td>
+      <td class="phase-cell"><span class="phase-badge advanced">Phase 3</span></td>
+      <td class="track-cell"><span class="track-tag advanced">Advanced</span></td>
+      <td class="topic-cell"><strong>Mini-Project #4 🏆</strong><br><span class="concept">Multi-agent + Agentic RAG capstone</span></td>
+      <td class="reading-cell"><a href="https://Review Phase 3 notes" target="_blank" rel="noopener" class="res-link">Review Phase 3 notes</a></td>
+      <td class="task-cell">Project: Planner delegates to RAG-Agent, Web-Agent, Code-Agent</td>
+      <td class="status-cell">
+        <select class="status-select" onchange="updateStatus(this, 55)">
+          <option value="todo">⬜ To Do</option>
+          <option value="progress">🔵 In Progress</option>
+          <option value="done">✅ Done</option>
+          <option value="skip">⏭ Skipped</option>
+        </select>
+      </td>
+      <td class="notes-cell"><input type="text" class="notes-input" placeholder="Add note..." onchange="saveNote(this, 55)"></td>
+    </tr>
+    <tr class="day-row production  " data-day="56" data-track="Production">
+      <td class="day-num">56</td>
+      <td class="date-cell"><span class="date-d">10 Jul</span><span class="date-dn">Fri</span></td>
+      <td class="phase-cell"><span class="phase-badge production">Phase 4</span></td>
+      <td class="track-cell"><span class="track-tag production">Production</span></td>
+      <td class="topic-cell"><strong>LangSmith Observability</strong><br><span class="concept">Tracing, datasets, run comparison, prompt hub</span></td>
+      <td class="reading-cell"><a href="https://docs.smith.langchain.com" target="_blank" rel="noopener" class="res-link">docs.smith.langchain.com</a></td>
+      <td class="task-cell">Instrument Phase 3 project with LangSmith; trace 10 runs</td>
+      <td class="status-cell">
+        <select class="status-select" onchange="updateStatus(this, 56)">
+          <option value="todo">⬜ To Do</option>
+          <option value="progress">🔵 In Progress</option>
+          <option value="done">✅ Done</option>
+          <option value="skip">⏭ Skipped</option>
+        </select>
+      </td>
+      <td class="notes-cell"><input type="text" class="notes-input" placeholder="Add note..." onchange="saveNote(this, 56)"></td>
+    </tr>
+    <tr class="day-row production weekend " data-day="57" data-track="Production">
+      <td class="day-num">57</td>
+      <td class="date-cell"><span class="date-d">11 Jul</span><span class="date-dn">Sat</span></td>
+      <td class="phase-cell"><span class="phase-badge production">Phase 4</span></td>
+      <td class="track-cell"><span class="track-tag production">Production</span></td>
+      <td class="topic-cell"><strong>Langfuse OSS</strong><br><span class="concept">Self-host Langfuse; traces, scores, dashboards</span></td>
+      <td class="reading-cell"><a href="https://langfuse.com/docs" target="_blank" rel="noopener" class="res-link">langfuse.com/docs</a></td>
+      <td class="task-cell">Set up Langfuse locally; compare with LangSmith</td>
+      <td class="status-cell">
+        <select class="status-select" onchange="updateStatus(this, 57)">
+          <option value="todo">⬜ To Do</option>
+          <option value="progress">🔵 In Progress</option>
+          <option value="done">✅ Done</option>
+          <option value="skip">⏭ Skipped</option>
+        </select>
+      </td>
+      <td class="notes-cell"><input type="text" class="notes-input" placeholder="Add note..." onchange="saveNote(this, 57)"></td>
+    </tr>
+    <tr class="day-row production weekend " data-day="58" data-track="Production">
+      <td class="day-num">58</td>
+      <td class="date-cell"><span class="date-d">12 Jul</span><span class="date-dn">Sun</span></td>
+      <td class="phase-cell"><span class="phase-badge production">Phase 4</span></td>
+      <td class="track-cell"><span class="track-tag production">Production</span></td>
+      <td class="topic-cell"><strong>RAGAS Advanced Eval</strong><br><span class="concept">TestsetGenerator, custom metrics, CI integration</span></td>
+      <td class="reading-cell"><a href="https://docs.ragas.io/en/latest/getstarted" target="_blank" rel="noopener" class="res-link">docs.ragas.io/en/latest/getstarted</a></td>
+      <td class="task-cell">Generate synthetic test set; add RAGAS eval to CI pipeline</td>
+      <td class="status-cell">
+        <select class="status-select" onchange="updateStatus(this, 58)">
+          <option value="todo">⬜ To Do</option>
+          <option value="progress">🔵 In Progress</option>
+          <option value="done">✅ Done</option>
+          <option value="skip">⏭ Skipped</option>
+        </select>
+      </td>
+      <td class="notes-cell"><input type="text" class="notes-input" placeholder="Add note..." onchange="saveNote(this, 58)"></td>
+    </tr>
+    <tr class="day-row production  " data-day="59" data-track="Production">
+      <td class="day-num">59</td>
+      <td class="date-cell"><span class="date-d">13 Jul</span><span class="date-dn">Mon</span></td>
+      <td class="phase-cell"><span class="phase-badge production">Phase 4</span></td>
+      <td class="track-cell"><span class="track-tag production">Production</span></td>
+      <td class="topic-cell"><strong>DeepEval Framework</strong><br><span class="concept">LLM unit tests, G-Eval, custom metrics</span></td>
+      <td class="reading-cell"><a href="https://docs.confident-ai.com" target="_blank" rel="noopener" class="res-link">docs.confident-ai.com</a></td>
+      <td class="task-cell">Write 10 DeepEval test cases for your RAG system</td>
+      <td class="status-cell">
+        <select class="status-select" onchange="updateStatus(this, 59)">
+          <option value="todo">⬜ To Do</option>
+          <option value="progress">🔵 In Progress</option>
+          <option value="done">✅ Done</option>
+          <option value="skip">⏭ Skipped</option>
+        </select>
+      </td>
+      <td class="notes-cell"><input type="text" class="notes-input" placeholder="Add note..." onchange="saveNote(this, 59)"></td>
+    </tr>
+    <tr class="day-row production  " data-day="60" data-track="Production">
+      <td class="day-num">60</td>
+      <td class="date-cell"><span class="date-d">14 Jul</span><span class="date-dn">Tue</span></td>
+      <td class="phase-cell"><span class="phase-badge production">Phase 4</span></td>
+      <td class="track-cell"><span class="track-tag production">Production</span></td>
+      <td class="topic-cell"><strong>Token Budget & Cost</strong><br><span class="concept">Track tokens, streaming, prompt caching, batching</span></td>
+      <td class="reading-cell"><a href="https://docs.anthropic.com/en/docs/build-with-claude/prompt-caching" target="_blank" rel="noopener" class="res-link">docs.anthropic.com/en/docs/build-with-claude/prompt-caching</a></td>
+      <td class="task-cell">Add token tracking; implement prompt caching; reduce cost</td>
+      <td class="status-cell">
+        <select class="status-select" onchange="updateStatus(this, 60)">
+          <option value="todo">⬜ To Do</option>
+          <option value="progress">🔵 In Progress</option>
+          <option value="done">✅ Done</option>
+          <option value="skip">⏭ Skipped</option>
+        </select>
+      </td>
+      <td class="notes-cell"><input type="text" class="notes-input" placeholder="Add note..." onchange="saveNote(this, 60)"></td>
+    </tr>
+    <tr class="day-row production  " data-day="61" data-track="Production">
+      <td class="day-num">61</td>
+      <td class="date-cell"><span class="date-d">15 Jul</span><span class="date-dn">Wed</span></td>
+      <td class="phase-cell"><span class="phase-badge production">Phase 4</span></td>
+      <td class="track-cell"><span class="track-tag production">Production</span></td>
+      <td class="topic-cell"><strong>FastAPI Deployment</strong><br><span class="concept">Wrap agent/RAG in FastAPI; async endpoints</span></td>
+      <td class="reading-cell"><a href="https://fastapi.tiangolo.com" target="_blank" rel="noopener" class="res-link">fastapi.tiangolo.com</a></td>
+      <td class="task-cell">Deploy RAG as REST API with /query and /ingest endpoints</td>
+      <td class="status-cell">
+        <select class="status-select" onchange="updateStatus(this, 61)">
+          <option value="todo">⬜ To Do</option>
+          <option value="progress">🔵 In Progress</option>
+          <option value="done">✅ Done</option>
+          <option value="skip">⏭ Skipped</option>
+        </select>
+      </td>
+      <td class="notes-cell"><input type="text" class="notes-input" placeholder="Add note..." onchange="saveNote(this, 61)"></td>
+    </tr>
+    <tr class="day-row production  " data-day="62" data-track="Production">
+      <td class="day-num">62</td>
+      <td class="date-cell"><span class="date-d">16 Jul</span><span class="date-dn">Thu</span></td>
+      <td class="phase-cell"><span class="phase-badge production">Phase 4</span></td>
+      <td class="track-cell"><span class="track-tag production">Production</span></td>
+      <td class="topic-cell"><strong>Docker & Compose</strong><br><span class="concept">Containerise app + Qdrant + Langfuse in docker-compose</span></td>
+      <td class="reading-cell"><a href="https://docs.docker.com/compose/gettingstarted" target="_blank" rel="noopener" class="res-link">docs.docker.com/compose/gettingstarted</a></td>
+      <td class="task-cell">Write Dockerfile + docker-compose.yml; test locally</td>
+      <td class="status-cell">
+        <select class="status-select" onchange="updateStatus(this, 62)">
+          <option value="todo">⬜ To Do</option>
+          <option value="progress">🔵 In Progress</option>
+          <option value="done">✅ Done</option>
+          <option value="skip">⏭ Skipped</option>
+        </select>
+      </td>
+      <td class="notes-cell"><input type="text" class="notes-input" placeholder="Add note..." onchange="saveNote(this, 62)"></td>
+    </tr>
+    <tr class="day-row production  " data-day="63" data-track="Production">
+      <td class="day-num">63</td>
+      <td class="date-cell"><span class="date-d">17 Jul</span><span class="date-dn">Fri</span></td>
+      <td class="phase-cell"><span class="phase-badge production">Phase 4</span></td>
+      <td class="track-cell"><span class="track-tag production">Production</span></td>
+      <td class="topic-cell"><strong>Rate Limiting & Retry</strong><br><span class="concept">tenacity, exponential backoff, rate limit headers</span></td>
+      <td class="reading-cell"><a href="https://tenacity.readthedocs.io" target="_blank" rel="noopener" class="res-link">tenacity.readthedocs.io</a></td>
+      <td class="task-cell">Add retry decorator to all LLM calls; test with throttled key</td>
+      <td class="status-cell">
+        <select class="status-select" onchange="updateStatus(this, 63)">
+          <option value="todo">⬜ To Do</option>
+          <option value="progress">🔵 In Progress</option>
+          <option value="done">✅ Done</option>
+          <option value="skip">⏭ Skipped</option>
+        </select>
+      </td>
+      <td class="notes-cell"><input type="text" class="notes-input" placeholder="Add note..." onchange="saveNote(this, 63)"></td>
+    </tr>
+    <tr class="day-row production weekend " data-day="64" data-track="Production">
+      <td class="day-num">64</td>
+      <td class="date-cell"><span class="date-d">18 Jul</span><span class="date-dn">Sat</span></td>
+      <td class="phase-cell"><span class="phase-badge production">Phase 4</span></td>
+      <td class="track-cell"><span class="track-tag production">Production</span></td>
+      <td class="topic-cell"><strong>Streaming Responses</strong><br><span class="concept">Server-sent events, streaming LangChain, async generators</span></td>
+      <td class="reading-cell"><a href="https://fastapi.tiangolo.com/advanced/custom-response" target="_blank" rel="noopener" class="res-link">fastapi.tiangolo.com/advanced/custom-response</a></td>
+      <td class="task-cell">Add streaming to FastAPI endpoint; test in browser</td>
+      <td class="status-cell">
+        <select class="status-select" onchange="updateStatus(this, 64)">
+          <option value="todo">⬜ To Do</option>
+          <option value="progress">🔵 In Progress</option>
+          <option value="done">✅ Done</option>
+          <option value="skip">⏭ Skipped</option>
+        </select>
+      </td>
+      <td class="notes-cell"><input type="text" class="notes-input" placeholder="Add note..." onchange="saveNote(this, 64)"></td>
+    </tr>
+    <tr class="day-row production weekend " data-day="65" data-track="Production">
+      <td class="day-num">65</td>
+      <td class="date-cell"><span class="date-d">19 Jul</span><span class="date-dn">Sun</span></td>
+      <td class="phase-cell"><span class="phase-badge production">Phase 4</span></td>
+      <td class="track-cell"><span class="track-tag production">Production</span></td>
+      <td class="topic-cell"><strong>Security Best Practices</strong><br><span class="concept">Secrets management, input sanitisation, RBAC</span></td>
+      <td class="reading-cell"><a href="https://cheatsheetseries.owasp.org/cheatsheets/LLM_AI_Security_Cheat_Sheet" target="_blank" rel="noopener" class="res-link">cheatsheetseries.owasp.org/cheatsheets/LLM_AI_Security_Cheat_Sheet</a></td>
+      <td class="task-cell">Audit project: fix hardcoded secrets; add input validation</td>
+      <td class="status-cell">
+        <select class="status-select" onchange="updateStatus(this, 65)">
+          <option value="todo">⬜ To Do</option>
+          <option value="progress">🔵 In Progress</option>
+          <option value="done">✅ Done</option>
+          <option value="skip">⏭ Skipped</option>
+        </select>
+      </td>
+      <td class="notes-cell"><input type="text" class="notes-input" placeholder="Add note..." onchange="saveNote(this, 65)"></td>
+    </tr>
+    <tr class="day-row production  " data-day="66" data-track="Production">
+      <td class="day-num">66</td>
+      <td class="date-cell"><span class="date-d">20 Jul</span><span class="date-dn">Mon</span></td>
+      <td class="phase-cell"><span class="phase-badge production">Phase 4</span></td>
+      <td class="track-cell"><span class="track-tag production">Production</span></td>
+      <td class="topic-cell"><strong>Fine-tuning Embeddings</strong><br><span class="concept">Contrastive learning, domain-adaptive fine-tuning</span></td>
+      <td class="reading-cell"><a href="https://huggingface.co/spaces/mteb/leaderboard" target="_blank" rel="noopener" class="res-link">huggingface.co/spaces/mteb/leaderboard</a></td>
+      <td class="task-cell">Fine-tune a sentence-transformer on 200 domain-specific pairs</td>
+      <td class="status-cell">
+        <select class="status-select" onchange="updateStatus(this, 66)">
+          <option value="todo">⬜ To Do</option>
+          <option value="progress">🔵 In Progress</option>
+          <option value="done">✅ Done</option>
+          <option value="skip">⏭ Skipped</option>
+        </select>
+      </td>
+      <td class="notes-cell"><input type="text" class="notes-input" placeholder="Add note..." onchange="saveNote(this, 66)"></td>
+    </tr>
+    <tr class="day-row production  " data-day="67" data-track="Production">
+      <td class="day-num">67</td>
+      <td class="date-cell"><span class="date-d">21 Jul</span><span class="date-dn">Tue</span></td>
+      <td class="phase-cell"><span class="phase-badge production">Phase 4</span></td>
+      <td class="track-cell"><span class="track-tag production">Production</span></td>
+      <td class="topic-cell"><strong>Monitoring & Alerting</strong><br><span class="concept">Prometheus, Grafana, latency/error dashboards</span></td>
+      <td class="reading-cell"><a href="https://grafana.com/docs/grafana/latest/getting-started" target="_blank" rel="noopener" class="res-link">grafana.com/docs/grafana/latest/getting-started</a></td>
+      <td class="task-cell">Add Prometheus metrics to FastAPI; build latency dashboard</td>
+      <td class="status-cell">
+        <select class="status-select" onchange="updateStatus(this, 67)">
+          <option value="todo">⬜ To Do</option>
+          <option value="progress">🔵 In Progress</option>
+          <option value="done">✅ Done</option>
+          <option value="skip">⏭ Skipped</option>
+        </select>
+      </td>
+      <td class="notes-cell"><input type="text" class="notes-input" placeholder="Add note..." onchange="saveNote(this, 67)"></td>
+    </tr>
+    <tr class="day-row production  " data-day="68" data-track="Production">
+      <td class="day-num">68</td>
+      <td class="date-cell"><span class="date-d">22 Jul</span><span class="date-dn">Wed</span></td>
+      <td class="phase-cell"><span class="phase-badge production">Phase 4</span></td>
+      <td class="track-cell"><span class="track-tag production">Production</span></td>
+      <td class="topic-cell"><strong>Cert Prep & Review</strong><br><span class="concept">Summarise all 4 phases; revisit weak areas</span></td>
+      <td class="reading-cell"><a href="https://All course notes + RAGAS dashboards" target="_blank" rel="noopener" class="res-link">All course notes + RAGAS dashboards</a></td>
+      <td class="task-cell">Create your cheat-sheet: 1 page per phase</td>
+      <td class="status-cell">
+        <select class="status-select" onchange="updateStatus(this, 68)">
+          <option value="todo">⬜ To Do</option>
+          <option value="progress">🔵 In Progress</option>
+          <option value="done">✅ Done</option>
+          <option value="skip">⏭ Skipped</option>
+        </select>
+      </td>
+      <td class="notes-cell"><input type="text" class="notes-input" placeholder="Add note..." onchange="saveNote(this, 68)"></td>
+    </tr>
+    <tr class="day-row production  project-row" data-day="69" data-track="Production">
+      <td class="day-num">69</td>
+      <td class="date-cell"><span class="date-d">23 Jul</span><span class="date-dn">Thu</span></td>
+      <td class="phase-cell"><span class="phase-badge production">Phase 4</span></td>
+      <td class="track-cell"><span class="track-tag production">Production</span></td>
+      <td class="topic-cell"><strong>Final Capstone 🚀</strong><br><span class="concept">Production-ready RAG + Agent system</span></td>
+      <td class="reading-cell"><a href="https://All course materials" target="_blank" rel="noopener" class="res-link">All course materials</a></td>
+      <td class="task-cell">Ship: GitHub repo with README, architecture diagram, eval results, Docker</td>
+      <td class="status-cell">
+        <select class="status-select" onchange="updateStatus(this, 69)">
+          <option value="todo">⬜ To Do</option>
+          <option value="progress">🔵 In Progress</option>
+          <option value="done">✅ Done</option>
+          <option value="skip">⏭ Skipped</option>
+        </select>
+      </td>
+      <td class="notes-cell"><input type="text" class="notes-input" placeholder="Add note..." onchange="saveNote(this, 69)"></td>
+    </tr>
+    <tr class="day-row production  project-row" data-day="70" data-track="Production">
+      <td class="day-num">70</td>
+      <td class="date-cell"><span class="date-d">24 Jul</span><span class="date-dn">Fri</span></td>
+      <td class="phase-cell"><span class="phase-badge production">Phase 4</span></td>
+      <td class="track-cell"><span class="track-tag production">Production</span></td>
+      <td class="topic-cell"><strong>Certification Day 🎓</strong><br><span class="concept">Exam completion + LinkedIn update</span></td>
+      <td class="reading-cell"><a href="https://Course completion materials" target="_blank" rel="noopener" class="res-link">Course completion materials</a></td>
+      <td class="task-cell">Complete chosen certification exam + update LinkedIn profile</td>
+      <td class="status-cell">
+        <select class="status-select" onchange="updateStatus(this, 70)">
+          <option value="todo">⬜ To Do</option>
+          <option value="progress">🔵 In Progress</option>
+          <option value="done">✅ Done</option>
+          <option value="skip">⏭ Skipped</option>
+        </select>
+      </td>
+      <td class="notes-cell"><input type="text" class="notes-input" placeholder="Add note..." onchange="saveNote(this, 70)"></td>
+    </tr>
+      </tbody>
+    </table>
+    <div class="empty-state" id="emptyState" style="display:none">No matching rows. Try a different filter.</div>
+  </div>
+</div>
+
+<div class="tab-panel" id="tab-dashboard">
+  <h2 class="section-head">Progress Dashboard</h2>
+  <p class="section-sub">Your real-time learning stats — updates as you mark days complete.</p>
+  <div class="dash-grid">
+    <div class="dash-card"><div class="dash-label">Days Done</div><div class="dash-val" id="d-done">0</div><div class="dash-sub">out of 70 days</div></div>
+    <div class="dash-card"><div class="dash-label">Hours Logged</div><div class="dash-val" id="d-hours">0</div><div class="dash-sub">out of 140 hours</div></div>
+    <div class="dash-card rag-card"><div class="dash-label">RAG Progress</div><div class="dash-val" id="d-rag">0/20</div><div class="dash-sub">Phase 1 modules</div></div>
+    <div class="dash-card agent-card"><div class="dash-label">Agents Progress</div><div class="dash-val" id="d-agent">0/15</div><div class="dash-sub">Phase 2 modules</div></div>
+    <div class="dash-card adv-card"><div class="dash-label">Multi-Agent</div><div class="dash-val" id="d-adv">0/10</div><div class="dash-sub">Phase 3 modules</div></div>
+    <div class="dash-card prod-card"><div class="dash-label">Production</div><div class="dash-val" id="d-prod">0/15</div><div class="dash-sub">Phase 4 modules</div></div>
+  </div>
+  <div class="phase-progress">
+    <h3>Phase-by-Phase Progress</h3>
+    <div class="pphase-row"><div class="pphase-name">Phase 0 — Prerequisites (10 days) · 16 May – 25 May</div><div class="pphase-bar"><div class="pphase-fill f" id="bar-f" style="width:0%"></div></div><div class="pphase-pct" id="pct-f">0%</div></div>
+    <div class="pphase-row"><div class="pphase-name">Phase 1 — RAG Fundamentals (20 days) · 26 May – 14 Jun</div><div class="pphase-bar"><div class="pphase-fill r" id="bar-r" style="width:0%"></div></div><div class="pphase-pct" id="pct-r">0%</div></div>
+    <div class="pphase-row"><div class="pphase-name">Phase 2 — AI Agents (15 days) · 15 Jun – 29 Jun</div><div class="pphase-bar"><div class="pphase-fill a" id="bar-a" style="width:0%"></div></div><div class="pphase-pct" id="pct-a">0%</div></div>
+    <div class="pphase-row"><div class="pphase-name">Phase 3 — Multi-Agent & Agentic RAG (10 days) · 30 Jun – 9 Jul</div><div class="pphase-bar"><div class="pphase-fill v" id="bar-v" style="width:0%"></div></div><div class="pphase-pct" id="pct-v">0%</div></div>
+    <div class="pphase-row"><div class="pphase-name">Phase 4 — Production & Evaluation (15 days) · 10 Jul – 24 Jul</div><div class="pphase-bar"><div class="pphase-fill p" id="bar-p" style="width:0%"></div></div><div class="pphase-pct" id="pct-p">0%</div></div>
+  </div>
+</div>
+
+<div class="tab-panel" id="tab-certs">
+  <h2 class="section-head">Certifications Roadmap</h2>
+  <p class="section-sub">Earn these at the right milestones to build a credible, hireable profile.</p>
+  <div class="cert-milestone"><h3>🏁 Milestone 1 — After Day 30 (RAG Complete)</h3><div class="cert-grid">
+        <div class="cert-card">
+          <div class="cert-type">Completion cert</div>
+          <div class="cert-name">DeepLearning.AI – LangChain for LLM App Dev</div>
+          <div class="cert-cost">Free with $49/mo sub</div>
+          <a href="https://deeplearning.ai/courses/langchain-for-llm-application-development" target="_blank" rel="noopener" class="cert-link">Visit →</a>
+        </div>
+        <div class="cert-card">
+          <div class="cert-type">Shareable cert</div>
+          <div class="cert-name">Coursera – Vector Databases from Embeddings to Apps</div>
+          <div class="cert-cost">Free audit / $49 cert</div>
+          <a href="https://coursera.org/learn/vector-databases-embeddings-applications" target="_blank" rel="noopener" class="cert-link">Visit →</a>
+        </div></div></div><div class="cert-milestone"><h3>🏁 Milestone 2 — After Day 45 (Agents Complete)</h3><div class="cert-grid">
+        <div class="cert-card">
+          <div class="cert-type">Completion cert</div>
+          <div class="cert-name">DeepLearning.AI – AI Agents in LangGraph</div>
+          <div class="cert-cost">Free with sub</div>
+          <a href="https://deeplearning.ai/courses/ai-agents-in-langgraph" target="_blank" rel="noopener" class="cert-link">Visit →</a>
+        </div>
+        <div class="cert-card">
+          <div class="cert-type">Completion cert</div>
+          <div class="cert-name">DeepLearning.AI – Multi-AI Agent Systems (CrewAI)</div>
+          <div class="cert-cost">Free with sub</div>
+          <a href="https://deeplearning.ai/courses/multi-ai-agent-systems-with-crewai" target="_blank" rel="noopener" class="cert-link">Visit →</a>
+        </div></div></div><div class="cert-milestone"><h3>🏁 Milestone 3 — After Day 70 (Full Course Complete)</h3><div class="cert-grid">
+        <div class="cert-card">
+          <div class="cert-type">Industry cert</div>
+          <div class="cert-name">AWS Certified Machine Learning – Specialty</div>
+          <div class="cert-cost">~$300 exam fee</div>
+          <a href="https://aws.amazon.com/certification/certified-machine-learning-specialty" target="_blank" rel="noopener" class="cert-link">Visit →</a>
+        </div>
+        <div class="cert-card">
+          <div class="cert-type">Industry cert</div>
+          <div class="cert-name">Google Cloud Professional ML Engineer</div>
+          <div class="cert-cost">~$200 exam fee</div>
+          <a href="https://cloud.google.com/certification/machine-learning-engineer" target="_blank" rel="noopener" class="cert-link">Visit →</a>
+        </div>
+        <div class="cert-card">
+          <div class="cert-type">LinkedIn cert</div>
+          <div class="cert-name">LinkedIn Learning – Gen AI Career Essentials (Microsoft)</div>
+          <div class="cert-cost">Free</div>
+          <a href="https://linkedin.com/learning/paths/career-essentials-in-generative-ai-by-microsoft-and-linkedin" target="_blank" rel="noopener" class="cert-link">Visit →</a>
+        </div>
+        <div class="cert-card">
+          <div class="cert-type">Professional cert</div>
+          <div class="cert-name">IBM Applied AI Professional Certificate (Coursera)</div>
+          <div class="cert-cost">~$49/mo</div>
+          <a href="https://coursera.org/professional-certificates/applied-artifical-intelligence-ibm-watson-ai" target="_blank" rel="noopener" class="cert-link">Visit →</a>
+        </div></div></div><div class="cert-milestone"><h3>🚀 Portfolio (Beats Most Certs for Hiring)</h3><div class="cert-grid">
+        <div class="cert-card">
+          <div class="cert-type">Portfolio</div>
+          <div class="cert-name">GitHub Capstone Repo</div>
+          <div class="cert-cost">Free — publish Day 69 project with README + architecture</div>
+          <a href="https://github.com" target="_blank" rel="noopener" class="cert-link">Visit →</a>
+        </div>
+        <div class="cert-card">
+          <div class="cert-type">Live demo</div>
+          <div class="cert-name">Hugging Face Spaces Demo</div>
+          <div class="cert-cost">Free GPU hosting — live demo of your RAG app</div>
+          <a href="https://huggingface.co/spaces" target="_blank" rel="noopener" class="cert-link">Visit →</a>
+        </div>
+        <div class="cert-card">
+          <div class="cert-type">Thought leadership</div>
+          <div class="cert-name">Technical Blog Post (Medium / Dev.to)</div>
+          <div class="cert-cost">Write a deep-dive on your agentic RAG architecture</div>
+          <a href="https://dev.to" target="_blank" rel="noopener" class="cert-link">Visit →</a>
+        </div></div></div>
+</div>
+
+<div class="tab-panel" id="tab-resources">
+  <h2 class="section-head">Reading List & Resources</h2>
+  <p class="section-sub">Every paper, doc, and course referenced in the 70-day plan.</p>
+  <div class="resources-grid"><div class="res-section"><h3>📖 Foundation</h3><ul class="res-list"><li><a href="https://python.org/doc/tutorial" target="_blank" rel="noopener">Python Official Tutorial</a><span class="res-cost">Free</span></li><li><a href="https://realpython.com/python3-object-oriented-programming" target="_blank" rel="noopener">Real Python – OOP Guide</a><span class="res-cost">Free</span></li><li><a href="https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/overview" target="_blank" rel="noopener">Anthropic Prompt Engineering</a><span class="res-cost">Free</span></li><li><a href="https://jalammar.github.io/illustrated-word2vec" target="_blank" rel="noopener">Jay Alammar – Illustrated Word2Vec</a><span class="res-cost">Free</span></li><li><a href="https://sbert.net" target="_blank" rel="noopener">Sentence-Transformers Docs</a><span class="res-cost">Free</span></li></ul></div><div class="res-section"><h3>🔍 RAG</h3><ul class="res-list"><li><a href="https://python.langchain.com/docs/concepts/rag" target="_blank" rel="noopener">LangChain RAG Docs</a><span class="res-cost">Free</span></li><li><a href="https://docs.llamaindex.ai" target="_blank" rel="noopener">LlamaIndex Docs</a><span class="res-cost">Free</span></li><li><a href="https://github.com/langchain-ai/rag-from-scratch" target="_blank" rel="noopener">Greg Kamradt – RAG from Scratch (50+ notebooks)</a><span class="res-cost">Free</span></li><li><a href="https://arxiv.org/abs/2309.15217" target="_blank" rel="noopener">RAGAS Paper</a><span class="res-cost">Free</span></li><li><a href="https://arxiv.org/abs/2212.10496" target="_blank" rel="noopener">HyDE Paper</a><span class="res-cost">Free</span></li><li><a href="https://arxiv.org/abs/2401.18059" target="_blank" rel="noopener">RAPTOR Paper</a><span class="res-cost">Free</span></li><li><a href="https://arxiv.org/abs/2404.16130" target="_blank" rel="noopener">GraphRAG Paper</a><span class="res-cost">Free</span></li><li><a href="https://pinecone.io/learn" target="_blank" rel="noopener">Pinecone Learning Center</a><span class="res-cost">Free</span></li></ul></div><div class="res-section"><h3>🤖 Agents</h3><ul class="res-list"><li><a href="https://arxiv.org/abs/2210.03629" target="_blank" rel="noopener">ReAct Paper</a><span class="res-cost">Free</span></li><li><a href="https://docs.anthropic.com/en/docs/build-with-claude/tool-use" target="_blank" rel="noopener">Anthropic Tool Use Docs</a><span class="res-cost">Free</span></li><li><a href="https://langchain-ai.github.io/langgraph" target="_blank" rel="noopener">LangGraph Docs</a><span class="res-cost">Free</span></li><li><a href="https://microsoft.github.io/autogen" target="_blank" rel="noopener">AutoGen Docs</a><span class="res-cost">Free</span></li><li><a href="https://docs.crewai.com" target="_blank" rel="noopener">CrewAI Docs</a><span class="res-cost">Free</span></li><li><a href="https://arxiv.org/abs/2310.08560" target="_blank" rel="noopener">MemGPT Paper</a><span class="res-cost">Free</span></li><li><a href="https://arxiv.org/abs/2303.11366" target="_blank" rel="noopener">Reflexion Paper</a><span class="res-cost">Free</span></li><li><a href="https://arxiv.org/abs/2310.11511" target="_blank" rel="noopener">Self-RAG Paper</a><span class="res-cost">Free</span></li></ul></div><div class="res-section"><h3>🎓 Paid Courses</h3><ul class="res-list"><li><a href="https://deeplearning.ai/courses" target="_blank" rel="noopener">DeepLearning.AI Short Courses (all RAG+Agent courses)</a><span class="res-cost">$49/mo</span></li><li><a href="https://udemy.com/course/llm-engineering-master-ai-and-large-language-models" target="_blank" rel="noopener">Udemy – LLM Engineering: Master AI & LLMs</a><span class="res-cost">~$15</span></li><li><a href="https://coursera.org/learn/generative-ai-with-llms" target="_blank" rel="noopener">Coursera – Generative AI with LLMs (AWS)</a><span class="res-cost">Free audit</span></li></ul></div></div>
+</div>
+
+</main>
+
+<script>
+const STORE = 'ragtracker_v3';
+function loadData(){ return JSON.parse(localStorage.getItem(STORE)||'{}'); }
+function saveData(d){ localStorage.setItem(STORE, JSON.stringify(d)); }
+
+document.addEventListener('DOMContentLoaded', () => {
+  const data = loadData();
+  document.querySelectorAll('.day-row').forEach(row => {
+    const day = row.dataset.day;
+    const sel = row.querySelector('.status-select');
+    const inp = row.querySelector('.notes-input');
+    if(data[day]?.status){ sel.value = data[day].status; applyRowStyle(row, data[day].status); }
+    if(data[day]?.note) inp.value = data[day].note;
+  });
+  updateStats();
+  showTodayBanner();
+});
+
+function updateStatus(sel, day){
+  const row = sel.closest('tr');
+  const status = sel.value;
+  const data = loadData();
+  data[day] = data[day]||{};
+  data[day].status = status;
+  saveData(data);
+  applyRowStyle(row, status);
+  updateStats();
+}
+
+function applyRowStyle(row, status){
+  row.classList.remove('status-done','status-skip');
+  if(status==='done') row.classList.add('status-done');
+  if(status==='skip') row.classList.add('status-skip');
+}
+
+function saveNote(inp, day){
+  const data = loadData();
+  data[day] = data[day]||{};
+  data[day].note = inp.value;
+  saveData(data);
+}
+
+function updateStats(){
+  const data = loadData();
+  let total=0,f=0,r=0,a=0,v=0,p=0;
+  document.querySelectorAll('.day-row').forEach(row=>{
+    const day=row.dataset.day;
+    const track=row.dataset.track;
+    const status=data[day]?.status||'todo';
+    if(status==='done'){
+      total++;
+      if(track==='Foundation') f++;
+      else if(track==='RAG') r++;
+      else if(track==='Agent') a++;
+      else if(track==='Advanced') v++;
+      else if(track==='Production') p++;
+    }
+  });
+  const pct=Math.round(total/70*100);
+  document.getElementById('doneCount').textContent=total;
+  document.getElementById('progressFill').style.width=pct+'%';
+  document.getElementById('progressPct').textContent=pct+'%';
+  document.getElementById('d-done').textContent=total;
+  document.getElementById('d-hours').textContent=total*2;
+  document.getElementById('d-rag').textContent=r+'/20';
+  document.getElementById('d-agent').textContent=a+'/15';
+  document.getElementById('d-adv').textContent=v+'/10';
+  document.getElementById('d-prod').textContent=p+'/15';
+  function setBar(bid,pid,val,max){
+    const pct2=Math.round(val/max*100);
+    document.getElementById(bid).style.width=pct2+'%';
+    document.getElementById(pid).textContent=pct2+'%';
+  }
+  setBar('bar-f','pct-f',f,10);
+  setBar('bar-r','pct-r',r,20);
+  setBar('bar-a','pct-a',a,15);
+  setBar('bar-v','pct-v',v,10);
+  setBar('bar-p','pct-p',p,15);
+}
+
+function showTodayBanner(){
+  const start=new Date('2026-05-16');
+  const today=new Date();today.setHours(0,0,0,0);
+  const diff=Math.floor((today-start)/(1000*60*60*24));
+  const dayNum=diff+1;
+  if(dayNum>=1&&dayNum<=70){
+    const row=document.querySelector(`[data-day="${dayNum}"]`);
+    if(row){
+      const topic=row.querySelector('strong')?.textContent||'';
+      const banner=document.getElementById('today-banner');
+      document.getElementById('today-text').innerHTML=
+        `<strong>Today is Day ${dayNum}</strong> — ${topic} &nbsp;·&nbsp;
+         <a href="#" style="color:var(--c-found)" onclick="scrollToDay(${dayNum});return false;">Jump to today →</a>`;
+      banner.style.display='flex';
+      row.id='day'+dayNum;
+    }
+  }
+}
+
+function scrollToDay(day){
+  const el=document.getElementById('day'+day);
+  if(el)el.scrollIntoView({behavior:'smooth',block:'center'});
+}
+
+let activeFilter='all',activeSearch='';
+function filterTrack(track,btn){
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  activeFilter=track;applyFilters();
+}
+function searchRows(q){activeSearch=q.toLowerCase();applyFilters();}
+function applyFilters(){
+  const data=loadData();
+  let visible=0;
+  document.querySelectorAll('.day-row').forEach(row=>{
+    const track=row.dataset.track;
+    const day=row.dataset.day;
+    const text=row.textContent.toLowerCase();
+    const status=data[day]?.status||'todo';
+    const matchTrack=activeFilter==='all'||(activeFilter==='done'&&status==='done')||(activeFilter===track);
+    const matchSearch=!activeSearch||text.includes(activeSearch);
+    if(matchTrack&&matchSearch){row.classList.remove('hidden');visible++;}
+    else row.classList.add('hidden');
+  });
+  document.getElementById('emptyState').style.display=visible===0?'block':'none';
+}
+function switchTab(name,btn){
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  btn.classList.add('active');
+}
+</script>
+</body>
+</html>
