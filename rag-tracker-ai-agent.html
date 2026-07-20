@@ -7,14 +7,15 @@
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg:        #07090f;
-  --surface:   #0d1117;
-  --surface2:  #161b22;
-  --border:    #21262d;
-  --border2:   #30363d;
-  --text:      #c9d1d9;
-  --muted:     #58a6b0;
-  --heading:   #e6edf3;
+  --bg:        #06080d;
+  --surface:   #0b0f16;
+  --surface2:  #131820;
+  --surface3:  #1a2030;
+  --border:    #1e2530;
+  --border2:   #2a3340;
+  --text:      #b0bccc;
+  --muted:     #6b7d8f;
+  --heading:   #eef2f8;
   --c-found:   #22d3ee;
   --c-rag:     #38bdf8;
   --c-agent:   #fb923c;
@@ -25,81 +26,106 @@
   --c-agent-d: #3d1a0a;
   --c-adv-d:   #0f2e18;
   --c-prod-d:  #2e1f03;
+  --radius:    10px;
+  --radius-sm: 6px;
+  --shadow:    0 4px 24px rgba(0,0,0,.4);
+  --transition: .2s cubic-bezier(.4,0,.2,1);
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html{scroll-behavior:smooth}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
 body{
   background:var(--bg);
   color:var(--text);
   font-family:'DM Mono',monospace;
   font-size:13px;
-  line-height:1.5;
+  line-height:1.55;
   min-height:100vh;
+  overflow-x:hidden;
 }
 body::before{
   content:'';
   position:fixed;inset:0;
   background-image:
-    linear-gradient(rgba(34,211,238,.025) 1px,transparent 1px),
-    linear-gradient(90deg,rgba(34,211,238,.025) 1px,transparent 1px);
+    linear-gradient(rgba(34,211,238,.022) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(34,211,238,.022) 1px,transparent 1px);
   background-size:48px 48px;
   pointer-events:none;z-index:0;
 }
+body::after{
+  content:'';
+  position:fixed;top:-50%;left:50%;transform:translateX(-50%);
+  width:900px;height:600px;
+  background:radial-gradient(ellipse,rgba(34,211,238,.06),transparent 70%);
+  pointer-events:none;z-index:0;
+}
+/* ===== HEADER ===== */
 .site-header{
   position:sticky;top:0;z-index:100;
-  background:rgba(7,9,15,.92);
-  backdrop-filter:blur(12px);
+  background:rgba(6,8,13,.88);
+  backdrop-filter:blur(16px);
+  -webkit-backdrop-filter:blur(16px);
   border-bottom:1px solid var(--border2);
   padding:0 24px;
 }
 .header-inner{
   max-width:1600px;margin:0 auto;
-  display:flex;align-items:center;gap:20px;
-  height:56px;
+  display:flex;align-items:center;gap:16px;
+  height:60px;
 }
 .logo{
   font-family:'Syne',sans-serif;
-  font-weight:800;font-size:16px;
+  font-weight:800;font-size:17px;
   color:var(--heading);
   white-space:nowrap;
   letter-spacing:-0.02em;
+  display:flex;align-items:center;gap:8px;
+}
+.logo::before{
+  content:'◆';color:var(--c-found);font-size:14px;
 }
 .logo span{color:var(--c-found)}
 .header-stats{
-  display:flex;gap:16px;align-items:center;
-  margin-left:auto;
+  display:flex;gap:10px;align-items:center;
+  margin-left:auto;flex-wrap:wrap;
 }
 .stat-pill{
   display:flex;align-items:center;gap:6px;
   background:var(--surface2);
   border:1px solid var(--border2);
   border-radius:20px;
-  padding:4px 12px;
+  padding:5px 14px;
   font-size:11px;color:var(--muted);
+  white-space:nowrap;
 }
 .stat-pill strong{color:var(--heading)}
 .progress-wrap{
   width:120px;height:6px;
-  background:var(--border2);border-radius:3px;
+  background:var(--surface3);border-radius:3px;
   overflow:hidden;
 }
 .progress-fill{
   height:100%;width:0%;
   background:linear-gradient(90deg,var(--c-found),var(--c-adv));
-  border-radius:3px;transition:width .4s ease;
+  border-radius:3px;transition:width .5s ease;
 }
+/* ===== NAV ===== */
 .nav-tabs{
   background:var(--surface);
   border-bottom:1px solid var(--border);
   padding:0 24px;
-  position:sticky;top:56px;z-index:90;
+  position:sticky;top:60px;z-index:90;
+  overflow-x:auto;
+  -webkit-overflow-scrolling:touch;
+  scrollbar-width:none;
 }
+.nav-tabs::-webkit-scrollbar{display:none}
 .nav-inner{
   max-width:1600px;margin:0 auto;
   display:flex;gap:0;
+  min-width:max-content;
 }
 .nav-tab{
-  padding:12px 20px;
+  padding:14px 22px;
   font-family:'DM Mono',monospace;
   font-size:11px;
   letter-spacing:.08em;
@@ -108,12 +134,14 @@ body::before{
   cursor:pointer;
   border:none;background:none;
   border-bottom:2px solid transparent;
-  transition:all .2s;
+  transition:var(--transition);
   white-space:nowrap;
 }
 .nav-tab:hover{color:var(--heading)}
 .nav-tab.active{color:var(--c-found);border-bottom-color:var(--c-found)}
+/* ===== MAIN ===== */
 main{max-width:1600px;margin:0 auto;padding:24px;position:relative;z-index:1}
+/* ===== FILTER BAR ===== */
 .filter-bar{
   display:flex;flex-wrap:wrap;gap:8px;
   margin-bottom:20px;
@@ -121,12 +149,13 @@ main{max-width:1600px;margin:0 auto;padding:24px;position:relative;z-index:1}
 }
 .filter-label{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-right:4px}
 .filter-btn{
-  padding:5px 14px;border-radius:3px;
+  padding:6px 14px;border-radius:20px;
   font-family:'DM Mono',monospace;font-size:10px;
   letter-spacing:.08em;text-transform:uppercase;
   cursor:pointer;border:1px solid var(--border2);
   background:var(--surface2);color:var(--muted);
-  transition:all .15s;
+  transition:var(--transition);
+  white-space:nowrap;
 }
 .filter-btn:hover,.filter-btn.active{
   border-color:var(--c-found);color:var(--c-found);
@@ -138,18 +167,22 @@ main{max-width:1600px;margin:0 auto;padding:24px;position:relative;z-index:1}
 .filter-btn.f-prod.active{border-color:var(--c-prod);color:var(--c-prod);background:rgba(251,191,36,.08)}
 .search-box{
   margin-left:auto;
-  padding:5px 12px;border-radius:3px;
+  padding:7px 14px;border-radius:20px;
   border:1px solid var(--border2);
   background:var(--surface2);color:var(--heading);
   font-family:'DM Mono',monospace;font-size:11px;
-  width:200px;outline:none;
+  width:220px;outline:none;
+  transition:var(--transition);
 }
-.search-box:focus{border-color:var(--c-found)}
+.search-box:focus{border-color:var(--c-found);box-shadow:0 0 0 3px rgba(34,211,238,.1)}
 .search-box::placeholder{color:var(--muted)}
+/* ===== TABLE ===== */
 .table-wrap{
   overflow-x:auto;
   border:1px solid var(--border);
-  border-radius:6px;
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
+  -webkit-overflow-scrolling:touch;
 }
 table{
   width:100%;border-collapse:collapse;
@@ -159,17 +192,18 @@ thead th{
   background:var(--surface2);
   color:var(--muted);
   font-size:9px;letter-spacing:.14em;text-transform:uppercase;
-  padding:10px 12px;
+  padding:12px 14px;
   text-align:left;
   border-bottom:1px solid var(--border2);
   white-space:nowrap;
+  position:sticky;top:0;
 }
 .day-row{
   border-bottom:1px solid var(--border);
   transition:background .15s;
 }
-.day-row:hover{background:rgba(255,255,255,.03)}
-.day-row td{padding:10px 12px;vertical-align:top}
+.day-row:hover{background:rgba(255,255,255,.025)}
+.day-row td{padding:12px 14px;vertical-align:top}
 .day-row.foundation{border-left:3px solid var(--c-found)}
 .day-row.rag{border-left:3px solid var(--c-rag)}
 .day-row.agent{border-left:3px solid var(--c-agent)}
@@ -189,7 +223,7 @@ thead th{
 .date-dn{font-size:10px;color:var(--muted)}
 .phase-badge{
   display:inline-block;font-size:8px;letter-spacing:.1em;
-  text-transform:uppercase;padding:2px 6px;border-radius:2px;
+  text-transform:uppercase;padding:3px 8px;border-radius:4px;
   font-weight:500;white-space:nowrap;
 }
 .phase-badge.foundation{background:var(--c-found-d);color:var(--c-found)}
@@ -199,7 +233,7 @@ thead th{
 .phase-badge.production{background:var(--c-prod-d);color:var(--c-prod)}
 .track-tag{
   display:inline-block;font-size:9px;letter-spacing:.08em;
-  text-transform:uppercase;padding:3px 8px;border-radius:10px;
+  text-transform:uppercase;padding:4px 10px;border-radius:12px;
   font-weight:500;white-space:nowrap;border:1px solid;
 }
 .track-tag.foundation{border-color:var(--c-found);color:var(--c-found)}
@@ -214,115 +248,208 @@ thead th{
 .res-link{
   color:var(--c-rag);text-decoration:none;font-size:11px;
   word-break:break-all;
+  transition:var(--transition);
 }
-.res-link:hover{text-decoration:underline}
+.res-link:hover{text-decoration:underline;color:var(--c-found)}
 .task-cell{min-width:200px;max-width:280px;font-size:11px;color:var(--text)}
 .status-select{
   background:var(--surface2);color:var(--heading);
-  border:1px solid var(--border2);border-radius:3px;
-  padding:4px 6px;font-family:'DM Mono',monospace;font-size:11px;
+  border:1px solid var(--border2);border-radius:var(--radius-sm);
+  padding:5px 8px;font-family:'DM Mono',monospace;font-size:11px;
   cursor:pointer;width:130px;outline:none;
+  transition:var(--transition);
 }
-.status-select:focus{border-color:var(--c-found)}
+.status-select:focus,.status-select:hover{border-color:var(--c-found)}
 .notes-input{
   background:transparent;border:none;
   border-bottom:1px solid var(--border2);
   color:var(--text);font-family:'DM Mono',monospace;font-size:11px;
-  width:100%;padding:2px 0;outline:none;min-width:120px;
+  width:100%;padding:3px 0;outline:none;min-width:120px;
+  transition:var(--transition);
 }
 .notes-input:focus{border-bottom-color:var(--c-found)}
 .notes-input::placeholder{color:var(--border2)}
 .day-row.hidden{display:none}
+/* ===== TAB PANELS ===== */
 .tab-panel{display:none}
 .tab-panel.active{display:block}
+/* ===== CERTS ===== */
 .cert-milestone{margin-bottom:36px}
 .cert-milestone h3{
   font-family:'Syne',sans-serif;font-weight:700;
-  font-size:14px;color:var(--heading);
-  margin-bottom:16px;padding-bottom:8px;
+  font-size:15px;color:var(--heading);
+  margin-bottom:16px;padding-bottom:10px;
   border-bottom:1px solid var(--border2);
 }
-.cert-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}
+.cert-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
 .cert-card{
   background:var(--surface2);border:1px solid var(--border2);
-  border-radius:6px;padding:16px;
-  transition:border-color .2s;
+  border-radius:var(--radius);padding:18px;
+  transition:var(--transition);
 }
-.cert-card:hover{border-color:var(--c-found)}
+.cert-card:hover{border-color:var(--c-found);transform:translateY(-2px);box-shadow:0 8px 24px rgba(34,211,238,.08)}
 .cert-type{
   font-size:9px;letter-spacing:.12em;text-transform:uppercase;
-  color:var(--c-prod);margin-bottom:8px;
+  color:var(--c-prod);margin-bottom:10px;
 }
-.cert-name{color:var(--heading);font-size:12px;font-weight:500;margin-bottom:6px;line-height:1.4}
-.cert-cost{color:var(--muted);font-size:11px;margin-bottom:10px}
+.cert-name{color:var(--heading);font-size:13px;font-weight:500;margin-bottom:8px;line-height:1.4}
+.cert-cost{color:var(--muted);font-size:11px;margin-bottom:12px}
 .cert-link{
   display:inline-block;color:var(--c-found);font-size:11px;
   text-decoration:none;border:1px solid var(--c-found);
-  border-radius:3px;padding:3px 10px;
-  transition:all .15s;
+  border-radius:var(--radius-sm);padding:4px 12px;
+  transition:var(--transition);
 }
 .cert-link:hover{background:rgba(34,211,238,.1)}
+/* ===== RESOURCES ===== */
 .resources-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px}
-.res-section{background:var(--surface2);border:1px solid var(--border2);border-radius:6px;padding:16px}
+.res-section{background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius);padding:18px}
 .res-section h3{
-  font-family:'Syne',sans-serif;font-size:13px;font-weight:700;
-  color:var(--heading);margin-bottom:12px;
+  font-family:'Syne',sans-serif;font-size:14px;font-weight:700;
+  color:var(--heading);margin-bottom:14px;
 }
 .res-list{list-style:none}
 .res-list li{
   display:flex;align-items:baseline;justify-content:space-between;
-  gap:8px;padding:6px 0;
+  gap:8px;padding:8px 0;
   border-bottom:1px solid var(--border);font-size:11px;
 }
 .res-list li:last-child{border-bottom:none}
-.res-list a{color:var(--c-rag);text-decoration:none}
-.res-list a:hover{text-decoration:underline}
+.res-list a{color:var(--c-rag);text-decoration:none;transition:var(--transition)}
+.res-list a:hover{text-decoration:underline;color:var(--c-found)}
 .res-cost{color:var(--muted);font-size:10px;white-space:nowrap}
+/* ===== DASHBOARD ===== */
 .dash-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;margin-bottom:32px}
 .dash-card{
   background:var(--surface2);border:1px solid var(--border2);
-  border-radius:6px;padding:16px 20px;
+  border-radius:var(--radius);padding:18px 22px;
   border-top:3px solid var(--c-found);
+  transition:var(--transition);
 }
+.dash-card:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
 .dash-card.rag-card{border-top-color:var(--c-rag)}
 .dash-card.agent-card{border-top-color:var(--c-agent)}
 .dash-card.adv-card{border-top-color:var(--c-adv)}
 .dash-card.prod-card{border-top-color:var(--c-prod)}
-.dash-label{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
-.dash-val{font-family:'Syne',sans-serif;font-size:28px;font-weight:800;color:var(--heading)}
-.dash-sub{font-size:11px;color:var(--muted);margin-top:4px}
+.dash-label{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+.dash-val{font-family:'Syne',sans-serif;font-size:30px;font-weight:800;color:var(--heading)}
+.dash-sub{font-size:11px;color:var(--muted);margin-top:6px}
 .phase-progress{margin-bottom:24px}
-.phase-progress h3{font-family:'Syne',sans-serif;font-size:13px;color:var(--heading);margin-bottom:12px}
-.pphase-row{display:flex;align-items:center;gap:12px;margin-bottom:10px}
-.pphase-name{width:300px;font-size:11px;color:var(--text)}
-.pphase-bar{flex:1;height:8px;background:var(--border2);border-radius:4px;overflow:hidden}
-.pphase-fill{height:100%;border-radius:4px;transition:width .4s ease}
+.phase-progress h3{font-family:'Syne',sans-serif;font-size:14px;color:var(--heading);margin-bottom:14px}
+.pphase-row{display:flex;align-items:center;gap:12px;margin-bottom:12px;flex-wrap:wrap}
+.pphase-name{width:300px;font-size:11px;color:var(--text);flex-shrink:0}
+.pphase-bar{flex:1;min-width:100px;height:8px;background:var(--surface3);border-radius:4px;overflow:hidden}
+.pphase-fill{height:100%;border-radius:4px;transition:width .5s ease}
 .pphase-fill.f{background:var(--c-found)}
 .pphase-fill.r{background:var(--c-rag)}
 .pphase-fill.a{background:var(--c-agent)}
 .pphase-fill.v{background:var(--c-adv)}
 .pphase-fill.p{background:var(--c-prod)}
 .pphase-pct{width:40px;font-size:11px;color:var(--muted);text-align:right}
+/* ===== TODAY BANNER ===== */
 .today-banner{
-  background:rgba(34,211,238,.08);border:1px solid rgba(34,211,238,.25);
-  border-radius:6px;padding:12px 16px;
+  background:linear-gradient(135deg,rgba(34,211,238,.1),rgba(56,189,248,.05));
+  border:1px solid rgba(34,211,238,.25);
+  border-radius:var(--radius);padding:14px 18px;
   display:flex;align-items:center;gap:12px;margin-bottom:20px;
   font-size:12px;color:var(--heading);
 }
 .today-dot{width:8px;height:8px;border-radius:50%;background:var(--c-found);flex-shrink:0;animation:pulse 2s infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+/* ===== SECTION HEADINGS ===== */
 .section-head{
   font-family:'Syne',sans-serif;font-weight:700;
-  font-size:22px;color:var(--heading);
-  margin-bottom:6px;letter-spacing:-0.02em;
+  font-size:24px;color:var(--heading);
+  margin-bottom:8px;letter-spacing:-0.02em;
 }
 .section-sub{color:var(--muted);font-size:12px;margin-bottom:24px}
 .empty-state{text-align:center;padding:60px 20px;color:var(--muted);font-size:13px}
+
+/* ========================================
+   RESPONSIVE — TABLET (≤1024px)
+   ======================================== */
+@media(max-width:1024px){
+  .header-inner{gap:12px}
+  .header-stats{gap:8px}
+  .stat-pill{padding:4px 10px;font-size:10px}
+  .progress-wrap{width:90px}
+  main{padding:20px}
+  .nav-tab{padding:12px 16px;font-size:10px}
+  .search-box{width:160px}
+  .dash-grid{grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px}
+  .dash-val{font-size:24px}
+  .pphase-name{width:220px;font-size:10px}
+}
+
+/* ========================================
+   RESPONSIVE — MOBILE (≤768px)
+   ======================================== */
 @media(max-width:768px){
-  .header-inner{flex-wrap:wrap;height:auto;padding:10px 0}
-  .header-stats{flex-wrap:wrap}
-  .nav-tab{padding:10px 12px;font-size:10px}
+  .site-header{padding:0 16px}
+  .header-inner{
+    flex-wrap:wrap;height:auto;padding:10px 0;gap:8px;
+  }
+  .logo{font-size:14px;flex:1 1 auto}
+  .header-stats{
+    width:100%;gap:6px;margin-left:0;
+    justify-content:flex-start;
+  }
+  .stat-pill{padding:3px 8px;font-size:10px}
+  .progress-wrap{width:80px}
+  .nav-tabs{padding:0 16px;top:auto;position:relative}
+  .nav-inner{min-width:max-content}
+  .nav-tab{padding:10px 14px;font-size:10px}
   main{padding:16px}
+  .filter-bar{gap:6px}
+  .filter-btn{padding:5px 10px;font-size:9px}
+  .search-box{
+    width:100%;margin-left:0;margin-top:4px;
+  }
+  .section-head{font-size:20px}
+  .section-sub{font-size:11px;margin-bottom:16px}
+  .dash-grid{grid-template-columns:repeat(2,1fr);gap:10px}
+  .dash-card{padding:14px 16px}
+  .dash-val{font-size:22px}
+  .dash-label{font-size:9px}
+  .pphase-row{flex-direction:column;align-items:stretch;gap:6px}
+  .pphase-name{width:100%;font-size:10px}
+  .pphase-bar{width:100%}
+  .pphase-pct{text-align:left;width:auto}
+  .cert-grid{grid-template-columns:1fr;gap:12px}
+  .resources-grid{grid-template-columns:1fr;gap:14px}
+  .today-banner{padding:12px 14px;font-size:11px;flex-wrap:wrap}
+  table{min-width:800px}
+  .day-row td{padding:8px 10px}
+  .topic-cell,.reading-cell,.task-cell{min-width:160px}
+}
+
+/* ========================================
+   RESPONSIVE — SMALL MOBILE (≤480px)
+   ======================================== */
+@media(max-width:480px){
+  .site-header{padding:0 12px}
+  .logo{font-size:13px}
+  .logo::before{display:none}
+  .header-stats{gap:4px}
+  .stat-pill{padding:3px 6px;font-size:9px}
+  .progress-wrap{width:60px}
+  main{padding:12px}
+  .nav-tab{padding:8px 10px;font-size:9px}
+  .filter-label{display:none}
+  .filter-btn{padding:4px 8px;font-size:8px}
+  .section-head{font-size:18px}
+  .dash-grid{grid-template-columns:1fr 1fr;gap:8px}
+  .dash-card{padding:12px 14px}
+  .dash-val{font-size:20px}
+  .cert-card{padding:14px}
+  .res-section{padding:14px}
+  table{min-width:600px}
+  .day-row td{padding:6px 8px;font-size:10px}
+  .day-num{font-size:14px;width:30px}
+  .date-d{font-size:11px}
+  .topic-cell strong{font-size:11px}
+  .concept{font-size:10px}
+  .status-select{width:110px;font-size:10px;padding:4px 6px}
 }
 </style>
 </head>
@@ -332,8 +459,8 @@ thead th{
   <div class="header-inner">
     <div class="logo">RAG & <span>AI Agents</span> — 70-Day Tracker</div>
     <div class="header-stats">
-      <div class="stat-pill">Start: <strong>16 May 2026</strong></div>
-      <div class="stat-pill">End: <strong>24 Jul 2026</strong></div>
+      <div class="stat-pill">Start: <strong>20 Jul 2026</strong></div>
+      <div class="stat-pill">End: <strong>28 Sep 2026</strong></div>
       <div class="stat-pill">Done: <strong id="doneCount">0</strong>/70</div>
       <div style="display:flex;align-items:center;gap:8px;">
         <div class="progress-wrap"><div class="progress-fill" id="progressFill"></div></div>
@@ -383,7 +510,7 @@ thead th{
 
     <tr class="day-row foundation weekend " data-day="1" data-track="Foundation">
       <td class="day-num">1</td>
-      <td class="date-cell"><span class="date-d">16 May</span><span class="date-dn">Sat</span></td>
+      <td class="date-cell"><span class="date-d">20 Jul</span><span class="date-dn">Mon</span></td>
       <td class="phase-cell"><span class="phase-badge foundation">Phase 0</span></td>
       <td class="track-cell"><span class="track-tag foundation">Foundation</span></td>
       <td class="topic-cell"><strong>Python Basics</strong><br><span class="concept">Python variables, functions, lists, dicts, loops</span></td>
@@ -401,7 +528,7 @@ thead th{
     </tr>
     <tr class="day-row foundation weekend " data-day="2" data-track="Foundation">
       <td class="day-num">2</td>
-      <td class="date-cell"><span class="date-d">17 May</span><span class="date-dn">Sun</span></td>
+      <td class="date-cell"><span class="date-d">21 Jul</span><span class="date-dn">Tue</span></td>
       <td class="phase-cell"><span class="phase-badge foundation">Phase 0</span></td>
       <td class="track-cell"><span class="track-tag foundation">Foundation</span></td>
       <td class="topic-cell"><strong>Python OOP</strong><br><span class="concept">Classes, inheritance, __init__, methods</span></td>
@@ -419,7 +546,7 @@ thead th{
     </tr>
     <tr class="day-row foundation  " data-day="3" data-track="Foundation">
       <td class="day-num">3</td>
-      <td class="date-cell"><span class="date-d">18 May</span><span class="date-dn">Mon</span></td>
+      <td class="date-cell"><span class="date-d">22 Jul</span><span class="date-dn">Wed</span></td>
       <td class="phase-cell"><span class="phase-badge foundation">Phase 0</span></td>
       <td class="track-cell"><span class="track-tag foundation">Foundation</span></td>
       <td class="topic-cell"><strong>Python File I/O + APIs</strong><br><span class="concept">File reading, requests lib, JSON parsing</span></td>
@@ -437,7 +564,7 @@ thead th{
     </tr>
     <tr class="day-row foundation  " data-day="4" data-track="Foundation">
       <td class="day-num">4</td>
-      <td class="date-cell"><span class="date-d">19 May</span><span class="date-dn">Tue</span></td>
+      <td class="date-cell"><span class="date-d">23 Jul</span><span class="date-dn">Thu</span></td>
       <td class="phase-cell"><span class="phase-badge foundation">Phase 0</span></td>
       <td class="track-cell"><span class="track-tag foundation">Foundation</span></td>
       <td class="topic-cell"><strong>pip, venv, dotenv</strong><br><span class="concept">Virtual envs, .env secrets, requirements.txt</span></td>
@@ -455,7 +582,7 @@ thead th{
     </tr>
     <tr class="day-row foundation  " data-day="5" data-track="Foundation">
       <td class="day-num">5</td>
-      <td class="date-cell"><span class="date-d">20 May</span><span class="date-dn">Wed</span></td>
+      <td class="date-cell"><span class="date-d">24 Jul</span><span class="date-dn">Fri</span></td>
       <td class="phase-cell"><span class="phase-badge foundation">Phase 0</span></td>
       <td class="track-cell"><span class="track-tag foundation">Foundation</span></td>
       <td class="topic-cell"><strong>Call Your First LLM</strong><br><span class="concept">Anthropic SDK: messages.create, read response</span></td>
@@ -473,7 +600,7 @@ thead th{
     </tr>
     <tr class="day-row foundation  " data-day="6" data-track="Foundation">
       <td class="day-num">6</td>
-      <td class="date-cell"><span class="date-d">21 May</span><span class="date-dn">Thu</span></td>
+      <td class="date-cell"><span class="date-d">25 Jul</span><span class="date-dn">Sat</span></td>
       <td class="phase-cell"><span class="phase-badge foundation">Phase 0</span></td>
       <td class="track-cell"><span class="track-tag foundation">Foundation</span></td>
       <td class="topic-cell"><strong>Prompt Engineering</strong><br><span class="concept">System prompts, few-shot, temperature, top-p</span></td>
@@ -491,7 +618,7 @@ thead th{
     </tr>
     <tr class="day-row foundation  " data-day="7" data-track="Foundation">
       <td class="day-num">7</td>
-      <td class="date-cell"><span class="date-d">22 May</span><span class="date-dn">Fri</span></td>
+      <td class="date-cell"><span class="date-d">26 Jul</span><span class="date-dn">Sun</span></td>
       <td class="phase-cell"><span class="phase-badge foundation">Phase 0</span></td>
       <td class="track-cell"><span class="track-tag foundation">Foundation</span></td>
       <td class="topic-cell"><strong>Tokens & Context Windows</strong><br><span class="concept">Tokenization, context limits, cost estimation</span></td>
@@ -509,7 +636,7 @@ thead th{
     </tr>
     <tr class="day-row foundation weekend " data-day="8" data-track="Foundation">
       <td class="day-num">8</td>
-      <td class="date-cell"><span class="date-d">23 May</span><span class="date-dn">Sat</span></td>
+      <td class="date-cell"><span class="date-d">27 Jul</span><span class="date-dn">Mon</span></td>
       <td class="phase-cell"><span class="phase-badge foundation">Phase 0</span></td>
       <td class="track-cell"><span class="track-tag foundation">Foundation</span></td>
       <td class="topic-cell"><strong>What Are Embeddings?</strong><br><span class="concept">Word vectors, semantic similarity, vector space</span></td>
@@ -527,7 +654,7 @@ thead th{
     </tr>
     <tr class="day-row foundation weekend " data-day="9" data-track="Foundation">
       <td class="day-num">9</td>
-      <td class="date-cell"><span class="date-d">24 May</span><span class="date-dn">Sun</span></td>
+      <td class="date-cell"><span class="date-d">28 Jul</span><span class="date-dn">Tue</span></td>
       <td class="phase-cell"><span class="phase-badge foundation">Phase 0</span></td>
       <td class="track-cell"><span class="track-tag foundation">Foundation</span></td>
       <td class="topic-cell"><strong>Generate Embeddings</strong><br><span class="concept">sentence-transformers, OpenAI text-embedding-3</span></td>
@@ -545,7 +672,7 @@ thead th{
     </tr>
     <tr class="day-row foundation  " data-day="10" data-track="Foundation">
       <td class="day-num">10</td>
-      <td class="date-cell"><span class="date-d">25 May</span><span class="date-dn">Mon</span></td>
+      <td class="date-cell"><span class="date-d">29 Jul</span><span class="date-dn">Wed</span></td>
       <td class="phase-cell"><span class="phase-badge foundation">Phase 0</span></td>
       <td class="track-cell"><span class="track-tag foundation">Foundation</span></td>
       <td class="topic-cell"><strong>Mini-Project #1</strong><br><span class="concept">Consolidate weeks 1-2 knowledge</span></td>
@@ -563,7 +690,7 @@ thead th{
     </tr>
     <tr class="day-row rag  " data-day="11" data-track="RAG">
       <td class="day-num">11</td>
-      <td class="date-cell"><span class="date-d">26 May</span><span class="date-dn">Tue</span></td>
+      <td class="date-cell"><span class="date-d">30 Jul</span><span class="date-dn">Thu</span></td>
       <td class="phase-cell"><span class="phase-badge rag">Phase 1</span></td>
       <td class="track-cell"><span class="track-tag rag">RAG</span></td>
       <td class="topic-cell"><strong>Naive RAG Overview</strong><br><span class="concept">load → chunk → embed → store → retrieve → generate pipeline</span></td>
@@ -581,7 +708,7 @@ thead th{
     </tr>
     <tr class="day-row rag  " data-day="12" data-track="RAG">
       <td class="day-num">12</td>
-      <td class="date-cell"><span class="date-d">27 May</span><span class="date-dn">Wed</span></td>
+      <td class="date-cell"><span class="date-d">31 Jul</span><span class="date-dn">Fri</span></td>
       <td class="phase-cell"><span class="phase-badge rag">Phase 1</span></td>
       <td class="track-cell"><span class="track-tag rag">RAG</span></td>
       <td class="topic-cell"><strong>Document Loaders</strong><br><span class="concept">PDFLoader, WebBaseLoader, TextLoader in LangChain</span></td>
@@ -599,7 +726,7 @@ thead th{
     </tr>
     <tr class="day-row rag  " data-day="13" data-track="RAG">
       <td class="day-num">13</td>
-      <td class="date-cell"><span class="date-d">28 May</span><span class="date-dn">Thu</span></td>
+      <td class="date-cell"><span class="date-d">01 Aug</span><span class="date-dn">Sat</span></td>
       <td class="phase-cell"><span class="phase-badge rag">Phase 1</span></td>
       <td class="track-cell"><span class="track-tag rag">RAG</span></td>
       <td class="topic-cell"><strong>Text Splitting</strong><br><span class="concept">RecursiveCharacterTextSplitter, chunk size vs overlap</span></td>
@@ -617,7 +744,7 @@ thead th{
     </tr>
     <tr class="day-row rag  " data-day="14" data-track="RAG">
       <td class="day-num">14</td>
-      <td class="date-cell"><span class="date-d">29 May</span><span class="date-dn">Fri</span></td>
+      <td class="date-cell"><span class="date-d">02 Aug</span><span class="date-dn">Sun</span></td>
       <td class="phase-cell"><span class="phase-badge rag">Phase 1</span></td>
       <td class="track-cell"><span class="track-tag rag">RAG</span></td>
       <td class="topic-cell"><strong>FAISS Vector Store</strong><br><span class="concept">Build local FAISS index; add docs; similarity search</span></td>
@@ -635,7 +762,7 @@ thead th{
     </tr>
     <tr class="day-row rag weekend " data-day="15" data-track="RAG">
       <td class="day-num">15</td>
-      <td class="date-cell"><span class="date-d">30 May</span><span class="date-dn">Sat</span></td>
+      <td class="date-cell"><span class="date-d">03 Aug</span><span class="date-dn">Mon</span></td>
       <td class="phase-cell"><span class="phase-badge rag">Phase 1</span></td>
       <td class="track-cell"><span class="track-tag rag">RAG</span></td>
       <td class="topic-cell"><strong>End-to-End Naive RAG</strong><br><span class="concept">Wire loader→splitter→FAISS→LLM into working chain</span></td>
@@ -653,7 +780,7 @@ thead th{
     </tr>
     <tr class="day-row rag weekend " data-day="16" data-track="RAG">
       <td class="day-num">16</td>
-      <td class="date-cell"><span class="date-d">31 May</span><span class="date-dn">Sun</span></td>
+      <td class="date-cell"><span class="date-d">04 Aug</span><span class="date-dn">Tue</span></td>
       <td class="phase-cell"><span class="phase-badge rag">Phase 1</span></td>
       <td class="track-cell"><span class="track-tag rag">RAG</span></td>
       <td class="topic-cell"><strong>ChromaDB</strong><br><span class="concept">Persistent vector store, metadata, collections</span></td>
@@ -671,7 +798,7 @@ thead th{
     </tr>
     <tr class="day-row rag  " data-day="17" data-track="RAG">
       <td class="day-num">17</td>
-      <td class="date-cell"><span class="date-d">01 Jun</span><span class="date-dn">Mon</span></td>
+      <td class="date-cell"><span class="date-d">05 Aug</span><span class="date-dn">Wed</span></td>
       <td class="phase-cell"><span class="phase-badge rag">Phase 1</span></td>
       <td class="track-cell"><span class="track-tag rag">RAG</span></td>
       <td class="topic-cell"><strong>Hybrid Search</strong><br><span class="concept">BM25 keyword + vector search fusion (RRF)</span></td>
@@ -689,7 +816,7 @@ thead th{
     </tr>
     <tr class="day-row rag  " data-day="18" data-track="RAG">
       <td class="day-num">18</td>
-      <td class="date-cell"><span class="date-d">02 Jun</span><span class="date-dn">Tue</span></td>
+      <td class="date-cell"><span class="date-d">06 Aug</span><span class="date-dn">Thu</span></td>
       <td class="phase-cell"><span class="phase-badge rag">Phase 1</span></td>
       <td class="track-cell"><span class="track-tag rag">RAG</span></td>
       <td class="topic-cell"><strong>Pinecone Cloud DB</strong><br><span class="concept">Serverless vector DB, upsert, query, metadata filter</span></td>
@@ -707,7 +834,7 @@ thead th{
     </tr>
     <tr class="day-row rag  " data-day="19" data-track="RAG">
       <td class="day-num">19</td>
-      <td class="date-cell"><span class="date-d">03 Jun</span><span class="date-dn">Wed</span></td>
+      <td class="date-cell"><span class="date-d">07 Aug</span><span class="date-dn">Fri</span></td>
       <td class="phase-cell"><span class="phase-badge rag">Phase 1</span></td>
       <td class="track-cell"><span class="track-tag rag">RAG</span></td>
       <td class="topic-cell"><strong>Qdrant & pgvector</strong><br><span class="concept">OSS options; run Qdrant locally via Docker</span></td>
@@ -725,7 +852,7 @@ thead th{
     </tr>
     <tr class="day-row rag  " data-day="20" data-track="RAG">
       <td class="day-num">20</td>
-      <td class="date-cell"><span class="date-d">04 Jun</span><span class="date-dn">Thu</span></td>
+      <td class="date-cell"><span class="date-d">08 Aug</span><span class="date-dn">Sat</span></td>
       <td class="phase-cell"><span class="phase-badge rag">Phase 1</span></td>
       <td class="track-cell"><span class="track-tag rag">RAG</span></td>
       <td class="topic-cell"><strong>Query Rewriting</strong><br><span class="concept">Rewrite user queries with LLM before retrieval</span></td>
@@ -743,7 +870,7 @@ thead th{
     </tr>
     <tr class="day-row rag  " data-day="21" data-track="RAG">
       <td class="day-num">21</td>
-      <td class="date-cell"><span class="date-d">05 Jun</span><span class="date-dn">Fri</span></td>
+      <td class="date-cell"><span class="date-d">09 Aug</span><span class="date-dn">Sun</span></td>
       <td class="phase-cell"><span class="phase-badge rag">Phase 1</span></td>
       <td class="track-cell"><span class="track-tag rag">RAG</span></td>
       <td class="topic-cell"><strong>Multi-Query Retriever</strong><br><span class="concept">Generate N query variants; union docs; deduplicate</span></td>
@@ -761,7 +888,7 @@ thead th{
     </tr>
     <tr class="day-row rag weekend " data-day="22" data-track="RAG">
       <td class="day-num">22</td>
-      <td class="date-cell"><span class="date-d">06 Jun</span><span class="date-dn">Sat</span></td>
+      <td class="date-cell"><span class="date-d">10 Aug</span><span class="date-dn">Mon</span></td>
       <td class="phase-cell"><span class="phase-badge rag">Phase 1</span></td>
       <td class="track-cell"><span class="track-tag rag">RAG</span></td>
       <td class="topic-cell"><strong>HyDE</strong><br><span class="concept">LLM generates hypothetical answer; embed it; retrieve</span></td>
@@ -779,7 +906,7 @@ thead th{
     </tr>
     <tr class="day-row rag weekend " data-day="23" data-track="RAG">
       <td class="day-num">23</td>
-      <td class="date-cell"><span class="date-d">07 Jun</span><span class="date-dn">Sun</span></td>
+      <td class="date-cell"><span class="date-d">11 Aug</span><span class="date-dn">Tue</span></td>
       <td class="phase-cell"><span class="phase-badge rag">Phase 1</span></td>
       <td class="track-cell"><span class="track-tag rag">RAG</span></td>
       <td class="topic-cell"><strong>Cross-Encoder Re-ranking</strong><br><span class="concept">Use ms-marco-MiniLM to re-rank top-k results</span></td>
@@ -797,7 +924,7 @@ thead th{
     </tr>
     <tr class="day-row rag  " data-day="24" data-track="RAG">
       <td class="day-num">24</td>
-      <td class="date-cell"><span class="date-d">08 Jun</span><span class="date-dn">Mon</span></td>
+      <td class="date-cell"><span class="date-d">12 Aug</span><span class="date-dn">Wed</span></td>
       <td class="phase-cell"><span class="phase-badge rag">Phase 1</span></td>
       <td class="track-cell"><span class="track-tag rag">RAG</span></td>
       <td class="topic-cell"><strong>Parent-Child Chunking</strong><br><span class="concept">Small chunks for retrieval; large parents for context</span></td>
@@ -815,7 +942,7 @@ thead th{
     </tr>
     <tr class="day-row rag  " data-day="25" data-track="RAG">
       <td class="day-num">25</td>
-      <td class="date-cell"><span class="date-d">09 Jun</span><span class="date-dn">Tue</span></td>
+      <td class="date-cell"><span class="date-d">13 Aug</span><span class="date-dn">Thu</span></td>
       <td class="phase-cell"><span class="phase-badge rag">Phase 1</span></td>
       <td class="track-cell"><span class="track-tag rag">RAG</span></td>
       <td class="topic-cell"><strong>Contextual Compression</strong><br><span class="concept">Filter irrelevant sentences before LLM</span></td>
@@ -833,7 +960,7 @@ thead th{
     </tr>
     <tr class="day-row rag  " data-day="26" data-track="RAG">
       <td class="day-num">26</td>
-      <td class="date-cell"><span class="date-d">10 Jun</span><span class="date-dn">Wed</span></td>
+      <td class="date-cell"><span class="date-d">14 Aug</span><span class="date-dn">Fri</span></td>
       <td class="phase-cell"><span class="phase-badge rag">Phase 1</span></td>
       <td class="track-cell"><span class="track-tag rag">RAG</span></td>
       <td class="topic-cell"><strong>RAG Evaluation Metrics</strong><br><span class="concept">Faithfulness, answer relevance, context precision/recall</span></td>
@@ -851,7 +978,7 @@ thead th{
     </tr>
     <tr class="day-row rag  " data-day="27" data-track="RAG">
       <td class="day-num">27</td>
-      <td class="date-cell"><span class="date-d">11 Jun</span><span class="date-dn">Thu</span></td>
+      <td class="date-cell"><span class="date-d">15 Aug</span><span class="date-dn">Sat</span></td>
       <td class="phase-cell"><span class="phase-badge rag">Phase 1</span></td>
       <td class="track-cell"><span class="track-tag rag">RAG</span></td>
       <td class="topic-cell"><strong>RAGAS Framework</strong><br><span class="concept">Install ragas; create test set; score your pipeline</span></td>
@@ -869,7 +996,7 @@ thead th{
     </tr>
     <tr class="day-row rag  " data-day="28" data-track="RAG">
       <td class="day-num">28</td>
-      <td class="date-cell"><span class="date-d">12 Jun</span><span class="date-dn">Fri</span></td>
+      <td class="date-cell"><span class="date-d">16 Aug</span><span class="date-dn">Sun</span></td>
       <td class="phase-cell"><span class="phase-badge rag">Phase 1</span></td>
       <td class="track-cell"><span class="track-tag rag">RAG</span></td>
       <td class="topic-cell"><strong>GraphRAG</strong><br><span class="concept">Knowledge-graph retrieval for multi-hop reasoning</span></td>
@@ -887,7 +1014,7 @@ thead th{
     </tr>
     <tr class="day-row rag weekend " data-day="29" data-track="RAG">
       <td class="day-num">29</td>
-      <td class="date-cell"><span class="date-d">13 Jun</span><span class="date-dn">Sat</span></td>
+      <td class="date-cell"><span class="date-d">17 Aug</span><span class="date-dn">Mon</span></td>
       <td class="phase-cell"><span class="phase-badge rag">Phase 1</span></td>
       <td class="track-cell"><span class="track-tag rag">RAG</span></td>
       <td class="topic-cell"><strong>RAPTOR</strong><br><span class="concept">Recursive abstractive processing with tree structure</span></td>
@@ -905,7 +1032,7 @@ thead th{
     </tr>
     <tr class="day-row rag weekend project-row" data-day="30" data-track="RAG">
       <td class="day-num">30</td>
-      <td class="date-cell"><span class="date-d">14 Jun</span><span class="date-dn">Sun</span></td>
+      <td class="date-cell"><span class="date-d">18 Aug</span><span class="date-dn">Tue</span></td>
       <td class="phase-cell"><span class="phase-badge rag">Phase 1</span></td>
       <td class="track-cell"><span class="track-tag rag">RAG</span></td>
       <td class="topic-cell"><strong>Mini-Project #2 🏆</strong><br><span class="concept">Build production-quality RAG system end-to-end</span></td>
@@ -923,7 +1050,7 @@ thead th{
     </tr>
     <tr class="day-row agent  " data-day="31" data-track="Agent">
       <td class="day-num">31</td>
-      <td class="date-cell"><span class="date-d">15 Jun</span><span class="date-dn">Mon</span></td>
+      <td class="date-cell"><span class="date-d">19 Aug</span><span class="date-dn">Wed</span></td>
       <td class="phase-cell"><span class="phase-badge agent">Phase 2</span></td>
       <td class="track-cell"><span class="track-tag agent">Agent</span></td>
       <td class="topic-cell"><strong>What Is an Agent?</strong><br><span class="concept">ReAct pattern: Thought→Action→Observation loop</span></td>
@@ -941,7 +1068,7 @@ thead th{
     </tr>
     <tr class="day-row agent  " data-day="32" data-track="Agent">
       <td class="day-num">32</td>
-      <td class="date-cell"><span class="date-d">16 Jun</span><span class="date-dn">Tue</span></td>
+      <td class="date-cell"><span class="date-d">20 Aug</span><span class="date-dn">Thu</span></td>
       <td class="phase-cell"><span class="phase-badge agent">Phase 2</span></td>
       <td class="track-cell"><span class="track-tag agent">Agent</span></td>
       <td class="topic-cell"><strong>Tool / Function Calling</strong><br><span class="concept">OpenAI/Anthropic tool use JSON schema</span></td>
@@ -959,7 +1086,7 @@ thead th{
     </tr>
     <tr class="day-row agent  " data-day="33" data-track="Agent">
       <td class="day-num">33</td>
-      <td class="date-cell"><span class="date-d">17 Jun</span><span class="date-dn">Wed</span></td>
+      <td class="date-cell"><span class="date-d">21 Aug</span><span class="date-dn">Fri</span></td>
       <td class="phase-cell"><span class="phase-badge agent">Phase 2</span></td>
       <td class="track-cell"><span class="track-tag agent">Agent</span></td>
       <td class="topic-cell"><strong>LangChain AgentExecutor</strong><br><span class="concept">Tools list, AgentExecutor, verbose tracing</span></td>
@@ -977,7 +1104,7 @@ thead th{
     </tr>
     <tr class="day-row agent  " data-day="34" data-track="Agent">
       <td class="day-num">34</td>
-      <td class="date-cell"><span class="date-d">18 Jun</span><span class="date-dn">Thu</span></td>
+      <td class="date-cell"><span class="date-d">22 Aug</span><span class="date-dn">Sat</span></td>
       <td class="phase-cell"><span class="phase-badge agent">Phase 2</span></td>
       <td class="track-cell"><span class="track-tag agent">Agent</span></td>
       <td class="topic-cell"><strong>Building Custom Tools</strong><br><span class="concept">@tool decorator, StructuredTool, BaseTool class</span></td>
@@ -995,7 +1122,7 @@ thead th{
     </tr>
     <tr class="day-row agent  " data-day="35" data-track="Agent">
       <td class="day-num">35</td>
-      <td class="date-cell"><span class="date-d">19 Jun</span><span class="date-dn">Fri</span></td>
+      <td class="date-cell"><span class="date-d">23 Aug</span><span class="date-dn">Sun</span></td>
       <td class="phase-cell"><span class="phase-badge agent">Phase 2</span></td>
       <td class="track-cell"><span class="track-tag agent">Agent</span></td>
       <td class="topic-cell"><strong>Agent Memory Basics</strong><br><span class="concept">ConversationBufferMemory, chat history in agents</span></td>
@@ -1013,7 +1140,7 @@ thead th{
     </tr>
     <tr class="day-row agent weekend " data-day="36" data-track="Agent">
       <td class="day-num">36</td>
-      <td class="date-cell"><span class="date-d">20 Jun</span><span class="date-dn">Sat</span></td>
+      <td class="date-cell"><span class="date-d">24 Aug</span><span class="date-dn">Mon</span></td>
       <td class="phase-cell"><span class="phase-badge agent">Phase 2</span></td>
       <td class="track-cell"><span class="track-tag agent">Agent</span></td>
       <td class="topic-cell"><strong>External Vector Memory</strong><br><span class="concept">Store past conversations in ChromaDB; retrieve relevant ones</span></td>
@@ -1031,7 +1158,7 @@ thead th{
     </tr>
     <tr class="day-row agent weekend " data-day="37" data-track="Agent">
       <td class="day-num">37</td>
-      <td class="date-cell"><span class="date-d">21 Jun</span><span class="date-dn">Sun</span></td>
+      <td class="date-cell"><span class="date-d">25 Aug</span><span class="date-dn">Tue</span></td>
       <td class="phase-cell"><span class="phase-badge agent">Phase 2</span></td>
       <td class="track-cell"><span class="track-tag agent">Agent</span></td>
       <td class="topic-cell"><strong>Chain-of-Thought Prompting</strong><br><span class="concept">Zero-shot CoT, few-shot CoT, structured reasoning</span></td>
@@ -1049,7 +1176,7 @@ thead th{
     </tr>
     <tr class="day-row agent  " data-day="38" data-track="Agent">
       <td class="day-num">38</td>
-      <td class="date-cell"><span class="date-d">22 Jun</span><span class="date-dn">Mon</span></td>
+      <td class="date-cell"><span class="date-d">26 Aug</span><span class="date-dn">Wed</span></td>
       <td class="phase-cell"><span class="phase-badge agent">Phase 2</span></td>
       <td class="track-cell"><span class="track-tag agent">Agent</span></td>
       <td class="topic-cell"><strong>Tree-of-Thought</strong><br><span class="concept">Explore multiple reasoning branches; score; backtrack</span></td>
@@ -1067,7 +1194,7 @@ thead th{
     </tr>
     <tr class="day-row agent  " data-day="39" data-track="Agent">
       <td class="day-num">39</td>
-      <td class="date-cell"><span class="date-d">23 Jun</span><span class="date-dn">Tue</span></td>
+      <td class="date-cell"><span class="date-d">27 Aug</span><span class="date-dn">Thu</span></td>
       <td class="phase-cell"><span class="phase-badge agent">Phase 2</span></td>
       <td class="track-cell"><span class="track-tag agent">Agent</span></td>
       <td class="topic-cell"><strong>Plan-and-Execute</strong><br><span class="concept">Planner LLM creates step plan; Executor LLM runs each step</span></td>
@@ -1085,7 +1212,7 @@ thead th{
     </tr>
     <tr class="day-row agent  " data-day="40" data-track="Agent">
       <td class="day-num">40</td>
-      <td class="date-cell"><span class="date-d">24 Jun</span><span class="date-dn">Wed</span></td>
+      <td class="date-cell"><span class="date-d">28 Aug</span><span class="date-dn">Fri</span></td>
       <td class="phase-cell"><span class="phase-badge agent">Phase 2</span></td>
       <td class="track-cell"><span class="track-tag agent">Agent</span></td>
       <td class="topic-cell"><strong>Self-Reflection / Reflexion</strong><br><span class="concept">Agent critiques its output; revises; loops until good</span></td>
@@ -1103,7 +1230,7 @@ thead th{
     </tr>
     <tr class="day-row agent  " data-day="41" data-track="Agent">
       <td class="day-num">41</td>
-      <td class="date-cell"><span class="date-d">25 Jun</span><span class="date-dn">Thu</span></td>
+      <td class="date-cell"><span class="date-d">29 Aug</span><span class="date-dn">Sat</span></td>
       <td class="phase-cell"><span class="phase-badge agent">Phase 2</span></td>
       <td class="track-cell"><span class="track-tag agent">Agent</span></td>
       <td class="topic-cell"><strong>Structured Outputs</strong><br><span class="concept">Pydantic models, instructor library, JSON mode</span></td>
@@ -1121,7 +1248,7 @@ thead th{
     </tr>
     <tr class="day-row agent  " data-day="42" data-track="Agent">
       <td class="day-num">42</td>
-      <td class="date-cell"><span class="date-d">26 Jun</span><span class="date-dn">Fri</span></td>
+      <td class="date-cell"><span class="date-d">30 Aug</span><span class="date-dn">Sun</span></td>
       <td class="phase-cell"><span class="phase-badge agent">Phase 2</span></td>
       <td class="track-cell"><span class="track-tag agent">Agent</span></td>
       <td class="topic-cell"><strong>Async Agents</strong><br><span class="concept">asyncio, aiohttp, parallel tool execution</span></td>
@@ -1139,7 +1266,7 @@ thead th{
     </tr>
     <tr class="day-row agent weekend " data-day="43" data-track="Agent">
       <td class="day-num">43</td>
-      <td class="date-cell"><span class="date-d">27 Jun</span><span class="date-dn">Sat</span></td>
+      <td class="date-cell"><span class="date-d">31 Aug</span><span class="date-dn">Mon</span></td>
       <td class="phase-cell"><span class="phase-badge agent">Phase 2</span></td>
       <td class="track-cell"><span class="track-tag agent">Agent</span></td>
       <td class="topic-cell"><strong>Agent Evaluation</strong><br><span class="concept">Trajectory evaluation, tool-use accuracy, LLM-as-judge</span></td>
@@ -1157,7 +1284,7 @@ thead th{
     </tr>
     <tr class="day-row agent weekend " data-day="44" data-track="Agent">
       <td class="day-num">44</td>
-      <td class="date-cell"><span class="date-d">28 Jun</span><span class="date-dn">Sun</span></td>
+      <td class="date-cell"><span class="date-d">01 Sep</span><span class="date-dn">Tue</span></td>
       <td class="phase-cell"><span class="phase-badge agent">Phase 2</span></td>
       <td class="track-cell"><span class="track-tag agent">Agent</span></td>
       <td class="topic-cell"><strong>Safety & Guardrails</strong><br><span class="concept">Input/output guardrails, prompt injection, sandboxing</span></td>
@@ -1175,7 +1302,7 @@ thead th{
     </tr>
     <tr class="day-row agent  project-row" data-day="45" data-track="Agent">
       <td class="day-num">45</td>
-      <td class="date-cell"><span class="date-d">29 Jun</span><span class="date-dn">Mon</span></td>
+      <td class="date-cell"><span class="date-d">02 Sep</span><span class="date-dn">Wed</span></td>
       <td class="phase-cell"><span class="phase-badge agent">Phase 2</span></td>
       <td class="track-cell"><span class="track-tag agent">Agent</span></td>
       <td class="topic-cell"><strong>Mini-Project #3 🏆</strong><br><span class="concept">End-to-end autonomous agent with tools, memory, guardrails</span></td>
@@ -1193,7 +1320,7 @@ thead th{
     </tr>
     <tr class="day-row advanced  " data-day="46" data-track="Advanced">
       <td class="day-num">46</td>
-      <td class="date-cell"><span class="date-d">30 Jun</span><span class="date-dn">Tue</span></td>
+      <td class="date-cell"><span class="date-d">03 Sep</span><span class="date-dn">Thu</span></td>
       <td class="phase-cell"><span class="phase-badge advanced">Phase 3</span></td>
       <td class="track-cell"><span class="track-tag advanced">Advanced</span></td>
       <td class="topic-cell"><strong>Multi-Agent Concepts</strong><br><span class="concept">Supervisor/worker patterns, message passing, shared state</span></td>
@@ -1211,7 +1338,7 @@ thead th{
     </tr>
     <tr class="day-row advanced  " data-day="47" data-track="Advanced">
       <td class="day-num">47</td>
-      <td class="date-cell"><span class="date-d">01 Jul</span><span class="date-dn">Wed</span></td>
+      <td class="date-cell"><span class="date-d">04 Sep</span><span class="date-dn">Fri</span></td>
       <td class="phase-cell"><span class="phase-badge advanced">Phase 3</span></td>
       <td class="track-cell"><span class="track-tag advanced">Advanced</span></td>
       <td class="topic-cell"><strong>LangGraph Basics</strong><br><span class="concept">StateGraph, nodes, edges, conditional branching</span></td>
@@ -1229,7 +1356,7 @@ thead th{
     </tr>
     <tr class="day-row advanced  " data-day="48" data-track="Advanced">
       <td class="day-num">48</td>
-      <td class="date-cell"><span class="date-d">02 Jul</span><span class="date-dn">Thu</span></td>
+      <td class="date-cell"><span class="date-d">05 Sep</span><span class="date-dn">Sat</span></td>
       <td class="phase-cell"><span class="phase-badge advanced">Phase 3</span></td>
       <td class="track-cell"><span class="track-tag advanced">Advanced</span></td>
       <td class="topic-cell"><strong>LangGraph Advanced</strong><br><span class="concept">Checkpointing, human-in-the-loop, streaming, cycles</span></td>
@@ -1247,7 +1374,7 @@ thead th{
     </tr>
     <tr class="day-row advanced  " data-day="49" data-track="Advanced">
       <td class="day-num">49</td>
-      <td class="date-cell"><span class="date-d">03 Jul</span><span class="date-dn">Fri</span></td>
+      <td class="date-cell"><span class="date-d">06 Sep</span><span class="date-dn">Sun</span></td>
       <td class="phase-cell"><span class="phase-badge advanced">Phase 3</span></td>
       <td class="track-cell"><span class="track-tag advanced">Advanced</span></td>
       <td class="topic-cell"><strong>AutoGen Framework</strong><br><span class="concept">ConversableAgent, GroupChat, coding agent, human proxy</span></td>
@@ -1265,7 +1392,7 @@ thead th{
     </tr>
     <tr class="day-row advanced weekend " data-day="50" data-track="Advanced">
       <td class="day-num">50</td>
-      <td class="date-cell"><span class="date-d">04 Jul</span><span class="date-dn">Sat</span></td>
+      <td class="date-cell"><span class="date-d">07 Sep</span><span class="date-dn">Mon</span></td>
       <td class="phase-cell"><span class="phase-badge advanced">Phase 3</span></td>
       <td class="track-cell"><span class="track-tag advanced">Advanced</span></td>
       <td class="topic-cell"><strong>CrewAI Framework</strong><br><span class="concept">Crews, roles, tasks, sequential vs hierarchical process</span></td>
@@ -1283,7 +1410,7 @@ thead th{
     </tr>
     <tr class="day-row advanced weekend " data-day="51" data-track="Advanced">
       <td class="day-num">51</td>
-      <td class="date-cell"><span class="date-d">05 Jul</span><span class="date-dn">Sun</span></td>
+      <td class="date-cell"><span class="date-d">08 Sep</span><span class="date-dn">Tue</span></td>
       <td class="phase-cell"><span class="phase-badge advanced">Phase 3</span></td>
       <td class="track-cell"><span class="track-tag advanced">Advanced</span></td>
       <td class="topic-cell"><strong>Agentic RAG — Retrieval as Tool</strong><br><span class="concept">Give agents a search_knowledge_base tool; decide when to retrieve</span></td>
@@ -1301,7 +1428,7 @@ thead th{
     </tr>
     <tr class="day-row advanced  " data-day="52" data-track="Advanced">
       <td class="day-num">52</td>
-      <td class="date-cell"><span class="date-d">06 Jul</span><span class="date-dn">Mon</span></td>
+      <td class="date-cell"><span class="date-d">09 Sep</span><span class="date-dn">Wed</span></td>
       <td class="phase-cell"><span class="phase-badge advanced">Phase 3</span></td>
       <td class="track-cell"><span class="track-tag advanced">Advanced</span></td>
       <td class="topic-cell"><strong>Self-RAG</strong><br><span class="concept">LLM decides whether to retrieve; critiques retrieved docs</span></td>
@@ -1319,7 +1446,7 @@ thead th{
     </tr>
     <tr class="day-row advanced  " data-day="53" data-track="Advanced">
       <td class="day-num">53</td>
-      <td class="date-cell"><span class="date-d">07 Jul</span><span class="date-dn">Tue</span></td>
+      <td class="date-cell"><span class="date-d">10 Sep</span><span class="date-dn">Thu</span></td>
       <td class="phase-cell"><span class="phase-badge advanced">Phase 3</span></td>
       <td class="track-cell"><span class="track-tag advanced">Advanced</span></td>
       <td class="topic-cell"><strong>CRAG (Corrective RAG)</strong><br><span class="concept">Evaluate retrieval quality; fall back to web search if low</span></td>
@@ -1337,7 +1464,7 @@ thead th{
     </tr>
     <tr class="day-row advanced  " data-day="54" data-track="Advanced">
       <td class="day-num">54</td>
-      <td class="date-cell"><span class="date-d">08 Jul</span><span class="date-dn">Wed</span></td>
+      <td class="date-cell"><span class="date-d">11 Sep</span><span class="date-dn">Fri</span></td>
       <td class="phase-cell"><span class="phase-badge advanced">Phase 3</span></td>
       <td class="track-cell"><span class="track-tag advanced">Advanced</span></td>
       <td class="topic-cell"><strong>Routing & Query Classification</strong><br><span class="concept">Route query types to different retrieval strategies</span></td>
@@ -1355,7 +1482,7 @@ thead th{
     </tr>
     <tr class="day-row advanced  project-row" data-day="55" data-track="Advanced">
       <td class="day-num">55</td>
-      <td class="date-cell"><span class="date-d">09 Jul</span><span class="date-dn">Thu</span></td>
+      <td class="date-cell"><span class="date-d">12 Sep</span><span class="date-dn">Sat</span></td>
       <td class="phase-cell"><span class="phase-badge advanced">Phase 3</span></td>
       <td class="track-cell"><span class="track-tag advanced">Advanced</span></td>
       <td class="topic-cell"><strong>Mini-Project #4 🏆</strong><br><span class="concept">Multi-agent + Agentic RAG capstone</span></td>
@@ -1373,7 +1500,7 @@ thead th{
     </tr>
     <tr class="day-row production  " data-day="56" data-track="Production">
       <td class="day-num">56</td>
-      <td class="date-cell"><span class="date-d">10 Jul</span><span class="date-dn">Fri</span></td>
+      <td class="date-cell"><span class="date-d">13 Sep</span><span class="date-dn">Sun</span></td>
       <td class="phase-cell"><span class="phase-badge production">Phase 4</span></td>
       <td class="track-cell"><span class="track-tag production">Production</span></td>
       <td class="topic-cell"><strong>LangSmith Observability</strong><br><span class="concept">Tracing, datasets, run comparison, prompt hub</span></td>
@@ -1391,7 +1518,7 @@ thead th{
     </tr>
     <tr class="day-row production weekend " data-day="57" data-track="Production">
       <td class="day-num">57</td>
-      <td class="date-cell"><span class="date-d">11 Jul</span><span class="date-dn">Sat</span></td>
+      <td class="date-cell"><span class="date-d">14 Sep</span><span class="date-dn">Mon</span></td>
       <td class="phase-cell"><span class="phase-badge production">Phase 4</span></td>
       <td class="track-cell"><span class="track-tag production">Production</span></td>
       <td class="topic-cell"><strong>Langfuse OSS</strong><br><span class="concept">Self-host Langfuse; traces, scores, dashboards</span></td>
@@ -1409,7 +1536,7 @@ thead th{
     </tr>
     <tr class="day-row production weekend " data-day="58" data-track="Production">
       <td class="day-num">58</td>
-      <td class="date-cell"><span class="date-d">12 Jul</span><span class="date-dn">Sun</span></td>
+      <td class="date-cell"><span class="date-d">15 Sep</span><span class="date-dn">Tue</span></td>
       <td class="phase-cell"><span class="phase-badge production">Phase 4</span></td>
       <td class="track-cell"><span class="track-tag production">Production</span></td>
       <td class="topic-cell"><strong>RAGAS Advanced Eval</strong><br><span class="concept">TestsetGenerator, custom metrics, CI integration</span></td>
@@ -1427,7 +1554,7 @@ thead th{
     </tr>
     <tr class="day-row production  " data-day="59" data-track="Production">
       <td class="day-num">59</td>
-      <td class="date-cell"><span class="date-d">13 Jul</span><span class="date-dn">Mon</span></td>
+      <td class="date-cell"><span class="date-d">16 Sep</span><span class="date-dn">Wed</span></td>
       <td class="phase-cell"><span class="phase-badge production">Phase 4</span></td>
       <td class="track-cell"><span class="track-tag production">Production</span></td>
       <td class="topic-cell"><strong>DeepEval Framework</strong><br><span class="concept">LLM unit tests, G-Eval, custom metrics</span></td>
@@ -1445,7 +1572,7 @@ thead th{
     </tr>
     <tr class="day-row production  " data-day="60" data-track="Production">
       <td class="day-num">60</td>
-      <td class="date-cell"><span class="date-d">14 Jul</span><span class="date-dn">Tue</span></td>
+      <td class="date-cell"><span class="date-d">17 Sep</span><span class="date-dn">Thu</span></td>
       <td class="phase-cell"><span class="phase-badge production">Phase 4</span></td>
       <td class="track-cell"><span class="track-tag production">Production</span></td>
       <td class="topic-cell"><strong>Token Budget & Cost</strong><br><span class="concept">Track tokens, streaming, prompt caching, batching</span></td>
@@ -1463,7 +1590,7 @@ thead th{
     </tr>
     <tr class="day-row production  " data-day="61" data-track="Production">
       <td class="day-num">61</td>
-      <td class="date-cell"><span class="date-d">15 Jul</span><span class="date-dn">Wed</span></td>
+      <td class="date-cell"><span class="date-d">18 Sep</span><span class="date-dn">Fri</span></td>
       <td class="phase-cell"><span class="phase-badge production">Phase 4</span></td>
       <td class="track-cell"><span class="track-tag production">Production</span></td>
       <td class="topic-cell"><strong>FastAPI Deployment</strong><br><span class="concept">Wrap agent/RAG in FastAPI; async endpoints</span></td>
@@ -1481,7 +1608,7 @@ thead th{
     </tr>
     <tr class="day-row production  " data-day="62" data-track="Production">
       <td class="day-num">62</td>
-      <td class="date-cell"><span class="date-d">16 Jul</span><span class="date-dn">Thu</span></td>
+      <td class="date-cell"><span class="date-d">19 Sep</span><span class="date-dn">Sat</span></td>
       <td class="phase-cell"><span class="phase-badge production">Phase 4</span></td>
       <td class="track-cell"><span class="track-tag production">Production</span></td>
       <td class="topic-cell"><strong>Docker & Compose</strong><br><span class="concept">Containerise app + Qdrant + Langfuse in docker-compose</span></td>
@@ -1499,7 +1626,7 @@ thead th{
     </tr>
     <tr class="day-row production  " data-day="63" data-track="Production">
       <td class="day-num">63</td>
-      <td class="date-cell"><span class="date-d">17 Jul</span><span class="date-dn">Fri</span></td>
+      <td class="date-cell"><span class="date-d">20 Sep</span><span class="date-dn">Sun</span></td>
       <td class="phase-cell"><span class="phase-badge production">Phase 4</span></td>
       <td class="track-cell"><span class="track-tag production">Production</span></td>
       <td class="topic-cell"><strong>Rate Limiting & Retry</strong><br><span class="concept">tenacity, exponential backoff, rate limit headers</span></td>
@@ -1517,7 +1644,7 @@ thead th{
     </tr>
     <tr class="day-row production weekend " data-day="64" data-track="Production">
       <td class="day-num">64</td>
-      <td class="date-cell"><span class="date-d">18 Jul</span><span class="date-dn">Sat</span></td>
+      <td class="date-cell"><span class="date-d">21 Sep</span><span class="date-dn">Mon</span></td>
       <td class="phase-cell"><span class="phase-badge production">Phase 4</span></td>
       <td class="track-cell"><span class="track-tag production">Production</span></td>
       <td class="topic-cell"><strong>Streaming Responses</strong><br><span class="concept">Server-sent events, streaming LangChain, async generators</span></td>
@@ -1535,7 +1662,7 @@ thead th{
     </tr>
     <tr class="day-row production weekend " data-day="65" data-track="Production">
       <td class="day-num">65</td>
-      <td class="date-cell"><span class="date-d">19 Jul</span><span class="date-dn">Sun</span></td>
+      <td class="date-cell"><span class="date-d">22 Sep</span><span class="date-dn">Tue</span></td>
       <td class="phase-cell"><span class="phase-badge production">Phase 4</span></td>
       <td class="track-cell"><span class="track-tag production">Production</span></td>
       <td class="topic-cell"><strong>Security Best Practices</strong><br><span class="concept">Secrets management, input sanitisation, RBAC</span></td>
@@ -1553,7 +1680,7 @@ thead th{
     </tr>
     <tr class="day-row production  " data-day="66" data-track="Production">
       <td class="day-num">66</td>
-      <td class="date-cell"><span class="date-d">20 Jul</span><span class="date-dn">Mon</span></td>
+      <td class="date-cell"><span class="date-d">23 Sep</span><span class="date-dn">Wed</span></td>
       <td class="phase-cell"><span class="phase-badge production">Phase 4</span></td>
       <td class="track-cell"><span class="track-tag production">Production</span></td>
       <td class="topic-cell"><strong>Fine-tuning Embeddings</strong><br><span class="concept">Contrastive learning, domain-adaptive fine-tuning</span></td>
@@ -1571,7 +1698,7 @@ thead th{
     </tr>
     <tr class="day-row production  " data-day="67" data-track="Production">
       <td class="day-num">67</td>
-      <td class="date-cell"><span class="date-d">21 Jul</span><span class="date-dn">Tue</span></td>
+      <td class="date-cell"><span class="date-d">24 Sep</span><span class="date-dn">Thu</span></td>
       <td class="phase-cell"><span class="phase-badge production">Phase 4</span></td>
       <td class="track-cell"><span class="track-tag production">Production</span></td>
       <td class="topic-cell"><strong>Monitoring & Alerting</strong><br><span class="concept">Prometheus, Grafana, latency/error dashboards</span></td>
@@ -1589,7 +1716,7 @@ thead th{
     </tr>
     <tr class="day-row production  " data-day="68" data-track="Production">
       <td class="day-num">68</td>
-      <td class="date-cell"><span class="date-d">22 Jul</span><span class="date-dn">Wed</span></td>
+      <td class="date-cell"><span class="date-d">25 Sep</span><span class="date-dn">Fri</span></td>
       <td class="phase-cell"><span class="phase-badge production">Phase 4</span></td>
       <td class="track-cell"><span class="track-tag production">Production</span></td>
       <td class="topic-cell"><strong>Cert Prep & Review</strong><br><span class="concept">Summarise all 4 phases; revisit weak areas</span></td>
@@ -1607,7 +1734,7 @@ thead th{
     </tr>
     <tr class="day-row production  project-row" data-day="69" data-track="Production">
       <td class="day-num">69</td>
-      <td class="date-cell"><span class="date-d">23 Jul</span><span class="date-dn">Thu</span></td>
+      <td class="date-cell"><span class="date-d">26 Sep</span><span class="date-dn">Sat</span></td>
       <td class="phase-cell"><span class="phase-badge production">Phase 4</span></td>
       <td class="track-cell"><span class="track-tag production">Production</span></td>
       <td class="topic-cell"><strong>Final Capstone 🚀</strong><br><span class="concept">Production-ready RAG + Agent system</span></td>
@@ -1625,7 +1752,7 @@ thead th{
     </tr>
     <tr class="day-row production  project-row" data-day="70" data-track="Production">
       <td class="day-num">70</td>
-      <td class="date-cell"><span class="date-d">24 Jul</span><span class="date-dn">Fri</span></td>
+      <td class="date-cell"><span class="date-d">27 Sep</span><span class="date-dn">Sun</span></td>
       <td class="phase-cell"><span class="phase-badge production">Phase 4</span></td>
       <td class="track-cell"><span class="track-tag production">Production</span></td>
       <td class="topic-cell"><strong>Certification Day 🎓</strong><br><span class="concept">Exam completion + LinkedIn update</span></td>
@@ -1660,11 +1787,11 @@ thead th{
   </div>
   <div class="phase-progress">
     <h3>Phase-by-Phase Progress</h3>
-    <div class="pphase-row"><div class="pphase-name">Phase 0 — Prerequisites (10 days) · 16 May – 25 May</div><div class="pphase-bar"><div class="pphase-fill f" id="bar-f" style="width:0%"></div></div><div class="pphase-pct" id="pct-f">0%</div></div>
-    <div class="pphase-row"><div class="pphase-name">Phase 1 — RAG Fundamentals (20 days) · 26 May – 14 Jun</div><div class="pphase-bar"><div class="pphase-fill r" id="bar-r" style="width:0%"></div></div><div class="pphase-pct" id="pct-r">0%</div></div>
-    <div class="pphase-row"><div class="pphase-name">Phase 2 — AI Agents (15 days) · 15 Jun – 29 Jun</div><div class="pphase-bar"><div class="pphase-fill a" id="bar-a" style="width:0%"></div></div><div class="pphase-pct" id="pct-a">0%</div></div>
-    <div class="pphase-row"><div class="pphase-name">Phase 3 — Multi-Agent & Agentic RAG (10 days) · 30 Jun – 9 Jul</div><div class="pphase-bar"><div class="pphase-fill v" id="bar-v" style="width:0%"></div></div><div class="pphase-pct" id="pct-v">0%</div></div>
-    <div class="pphase-row"><div class="pphase-name">Phase 4 — Production & Evaluation (15 days) · 10 Jul – 24 Jul</div><div class="pphase-bar"><div class="pphase-fill p" id="bar-p" style="width:0%"></div></div><div class="pphase-pct" id="pct-p">0%</div></div>
+    <div class="pphase-row"><div class="pphase-name">Phase 0 — Prerequisites (10 days) · 20 Jul – 29 Jul</div><div class="pphase-bar"><div class="pphase-fill f" id="bar-f" style="width:0%"></div></div><div class="pphase-pct" id="pct-f">0%</div></div>
+    <div class="pphase-row"><div class="pphase-name">Phase 1 — RAG Fundamentals (20 days) · 30 Jul – 18 Aug</div><div class="pphase-bar"><div class="pphase-fill r" id="bar-r" style="width:0%"></div></div><div class="pphase-pct" id="pct-r">0%</div></div>
+    <div class="pphase-row"><div class="pphase-name">Phase 2 — AI Agents (15 days) · 19 Aug – 2 Sep</div><div class="pphase-bar"><div class="pphase-fill a" id="bar-a" style="width:0%"></div></div><div class="pphase-pct" id="pct-a">0%</div></div>
+    <div class="pphase-row"><div class="pphase-name">Phase 3 — Multi-Agent & Agentic RAG (10 days) · 3 Sep – 12 Sep</div><div class="pphase-bar"><div class="pphase-fill v" id="bar-v" style="width:0%"></div></div><div class="pphase-pct" id="pct-v">0%</div></div>
+    <div class="pphase-row"><div class="pphase-name">Phase 4 — Production & Evaluation (15 days) · 13 Sep – 27 Sep</div><div class="pphase-bar"><div class="pphase-fill p" id="bar-p" style="width:0%"></div></div><div class="pphase-pct" id="pct-p">0%</div></div>
   </div>
 </div>
 
@@ -1829,7 +1956,7 @@ function updateStats(){
 }
 
 function showTodayBanner(){
-  const start=new Date('2026-05-16');
+  const start=new Date('2026-07-20');
   const today=new Date();today.setHours(0,0,0,0);
   const diff=Math.floor((today-start)/(1000*60*60*24));
   const dayNum=diff+1;
